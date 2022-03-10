@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity(), IHabitClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         habits.add(
             Habit(
             "Test habit",

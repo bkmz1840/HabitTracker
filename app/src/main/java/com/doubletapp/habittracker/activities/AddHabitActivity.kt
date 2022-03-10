@@ -76,6 +76,7 @@ class AddHabitActivity : AppCompatActivity() {
             binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
             setEditableHabit(habit!!)
         }
+        setChosenColor()
 
         val types = resources.getStringArray(R.array.habit_priority_spinner)
         val adapter = ArrayAdapter(this, R.layout.spinner_item, types)
@@ -210,8 +211,29 @@ class AddHabitActivity : AppCompatActivity() {
             val chosenBg = getDrawable(R.drawable.chosen_color_shape) as GradientDrawable
             chosenBg.color = ColorStateList.valueOf(colors[index])
             it.background = chosenBg
+            setChosenColor()
         }
         binding.habitColorPickerLayout.addView(colorView)
+    }
+
+    private fun setChosenColor() {
+        val bg = getDrawable(R.drawable.color_shape) as GradientDrawable
+        bg.color = ColorStateList.valueOf(chosenColor)
+        binding.habitChosenColor.background = bg
+
+        val chosenRgb = arrayOf(
+            Color.red(chosenColor),
+            Color.green(chosenColor),
+            Color.blue(chosenColor)
+        )
+        val chosenHsv = FloatArray(3)
+        Color.colorToHSV(chosenColor, chosenHsv)
+        val chosenRgbText = "R - ${chosenRgb[0]}, G - ${chosenRgb[1]}, B - ${chosenRgb[2]}"
+        val chosenHsvText = "H - ${chosenHsv[0]}, S - ${chosenHsv[1]}, V - ${chosenHsv[2]}"
+        binding.habitChosenColorRgb.text = chosenRgbText
+        binding.habitChosenColorRgb.setTextColor(chosenColor)
+        binding.habitChosenColorHsv.text = chosenHsvText
+        binding.habitChosenColorHsv.setTextColor(chosenColor)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

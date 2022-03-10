@@ -18,7 +18,7 @@
     <string name="habit_type_neutral">Нейтральная</string>
     <string name="habit_type_good">Хорошая</string>
     <string name="habit_color_picker_label">Цвет карточки с привычкой</string>
-    <string name="habit_color_picker_confirm">Выбрать цвет</string>
+    <string name="habit_color_picker_chosen_color_text">Выбранный цвет</string>
     <string name="edit_hint_habit_count_complete">Количество выполнения привычки</string>
     <string name="edit_hint_habit_period">Количество выполнения в день</string>
     <string name="btn_add_habit">Добавить привычку</string>
