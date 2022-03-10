@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Трекер привычек</string>
+    <string name="fab_content_description">Добавить привычку</string>
+    <string name="toolbar_add_habit_activity">Добавление привычки</string>
+    <string name="toolbar_edit_habit_activity">Редактирование привычки</string>
+    <string name="empty_habits">Вы пока не добавили ни одну привычку</string>
+    <string name="edit_hint_habit_title">Название привычки</string>
+    <string name="edit_hint_habit_description">Описание привычки</string>
+    <string name="label_spinner_habit_priority">Приоретет привычки:</string>
+    <string name="habit_priority_hint">Приоритет привычки</string>
+    <string-array name="habit_priority_spinner">
+        <item>Низкий</item>
+        <item>Средний</item>
+        <item>Высокий</item>
+    </string-array>
+    <string name="label_radio_group_habit_type">Тип привычки:</string>
+    <string name="habit_type_bad">Вредная</string>
+    <string name="habit_type_neutral">Нейтральная</string>
+    <string name="habit_type_good">Хорошая</string>
+    <string name="habit_color_picker_label">Цвет карточки с привычкой</string>
+    <string name="habit_color_picker_confirm">Выбрать цвет</string>
+    <string name="edit_hint_habit_count_complete">Количество выполнения привычки</string>
+    <string name="edit_hint_habit_period">Количество выполнения в день</string>
+    <string name="btn_add_habit">Добавить привычку</string>
+    <string name="btn_edit_habit">Отредактировать привычку</string>
+    <string name="toast_fail_add_habit">Не все поля заполнены или заполнены неправильно</string>
+    <string name="error_field_empty">Данное поле не может быть пустым</string>
+    <string name="error_field_not_number">Не похоже на число</string>
+</resources>
