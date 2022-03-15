@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.doubletapp.habittracker.HabitsViewHolder
 import com.doubletapp.habittracker.IHabitClickListener
-import com.doubletapp.habittracker.R
+import com.doubletapp.habittracker.databinding.HabitBinding
 import com.doubletapp.habittracker.models.Habit
 
 class HabitsAdapter(
@@ -16,7 +16,7 @@ class HabitsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return HabitsViewHolder(
-            inflater.inflate(R.layout.habit, parent, false),
+            HabitBinding.inflate(inflater, parent, false),
             onHabitClickListener
         )
     }

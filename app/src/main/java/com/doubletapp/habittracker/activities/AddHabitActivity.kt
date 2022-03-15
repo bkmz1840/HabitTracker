@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.databinding.ActivityAddHabitBinding
@@ -23,26 +24,9 @@ import com.doubletapp.habittracker.util.toEditable
 
 class AddHabitActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddHabitBinding
-    private var chosenHabitType = ""
+    private lateinit var colors: List<Int>
+    private var chosenHabitType = HabitType.NONE
     private var habit: Habit? = null
-    private val colors = listOf(
-        Color.parseColor("#F3E575"),
-        Color.parseColor("#EAC262"),
-        Color.parseColor("#E38E8F"),
-        Color.parseColor("#E896E3"),
-        Color.parseColor("#BF9FFA"),
-        Color.parseColor("#ACB9F2"),
-        Color.parseColor("#B0E1FC"),
-        Color.parseColor("#B0F7BB"),
-        Color.parseColor("#E6FA91"),
-        Color.parseColor("#D1BEB1"),
-        Color.parseColor("#94C5B8"),
-        Color.parseColor("#C5AEE9"),
-        Color.parseColor("#B89D18"),
-        Color.parseColor("#B84949"),
-        Color.parseColor("#88C9E2"),
-        Color.parseColor("#87BE8C"),
-    )
     private var chosenColorIndex = -1
     private var chosenColor: Int = Color.WHITE
 
@@ -57,24 +41,33 @@ class AddHabitActivity : AppCompatActivity() {
         toolbar?.setDisplayShowHomeEnabled(true)
 
         binding.habitTypeRadioGroup.setOnCheckedChangeListener { _, i ->
-            when (i) {
-                R.id.habit_type_radio_bad -> chosenHabitType = resources.getString(R.string.habit_type_bad)
-                R.id.habit_type_radio_neutral -> chosenHabitType = resources.getString(R.string.habit_type_neutral)
-                R.id.habit_type_radio_good -> chosenHabitType = resources.getString(R.string.habit_type_good)
+            chosenHabitType = when (i) {
+                R.id.habit_type_radio_bad -> HabitType.BAD
+                R.id.habit_type_radio_neutral -> HabitType.NEUTRAL
+                R.id.habit_type_radio_good -> HabitType.GOOD
+                else -> HabitType.NONE
             }
         }
 
-        for (i in colors.indices)
+        val colorNames = resources.getStringArray(R.array.habit_colors)
+        val pickedColors = mutableListOf<Int>()
+        val packageName = packageName
+        colorNames.forEach {
+            val colorId = resources.getIdentifier(it, "color", packageName)
+            pickedColors.add(
+                ContextCompat.getColor(this, colorId)
+            )
+        }
+        colors = pickedColors.toList()
+        for (i in colors.indices) {
             addColorView(colors[i], i)
+        }
 
-        if (intent != null && intent.extras != null
-            && intent.extras!!.containsKey(Settings.KEY_EDIT_HABIT)) {
-            habit = intent.extras!!.getParcelable(Settings.KEY_EDIT_HABIT)
-            if (habit == null)
-                throw NullPointerException("Editable habit is null")
+        habit = intent.getParcelableExtra(Settings.KEY_EDIT_HABIT)
+        habit?.let {
+            setEditableHabit(it)
             toolbar?.title = resources.getString(R.string.toolbar_edit_habit_activity)
             binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
-            setEditableHabit(habit!!)
         }
         setChosenColor()
 
@@ -91,19 +84,12 @@ class AddHabitActivity : AppCompatActivity() {
         binding.editHabitPriority.text = habit.priority.toEditable()
 
         when (habit.type) {
-            HabitType.BAD -> {
-                binding.habitTypeRadioBad.isChecked = true
-                chosenHabitType = resources.getString(R.string.habit_type_bad)
-            }
-            HabitType.NEUTRAL -> {
-                binding.habitTypeRadioNeutral.isChecked = true
-                chosenHabitType = resources.getString(R.string.habit_type_neutral)
-            }
-            HabitType.GOOD -> {
-                binding.habitTypeRadioGood.isChecked = true
-                chosenHabitType = resources.getString(R.string.habit_type_good)
-            }
+            HabitType.BAD -> binding.habitTypeRadioBad.isChecked = true
+            HabitType.NEUTRAL -> binding.habitTypeRadioNeutral.isChecked = true
+            HabitType.GOOD -> binding.habitTypeRadioGood.isChecked = true
+            else -> throw IllegalArgumentException("Unexpected habit type")
         }
+        chosenHabitType = habit.type
 
         binding.editHabitCountComplete.text = habit.countComplete.toString().toEditable()
         binding.editHabitPeriod.text = habit.period.toString().toEditable()
@@ -123,8 +109,8 @@ class AddHabitActivity : AppCompatActivity() {
         val priority = binding.editHabitPriority.text.toString()
         val countComplete = binding.editHabitCountComplete.text.toString().toIntOrNull()
         val period = binding.editHabitPeriod.text.toString().toIntOrNull()
-        if (title == "" || description == "" || priority == ""
-            || countComplete == null || period == null || chosenHabitType == "") {
+        if (title.isEmpty() || description.isEmpty() || priority.isEmpty()
+            || countComplete == null || period == null || chosenHabitType == HabitType.NONE) {
             Toast.makeText(
                 this@AddHabitActivity,
                 resources.getString(R.string.toast_fail_add_habit),
@@ -134,27 +120,27 @@ class AddHabitActivity : AppCompatActivity() {
             return@OnClickListener
         }
 
-        val intentKey: String
-        if (habit == null) {
+        var intentKey = ""
+        habit?.apply {
+            this.title = title
+            this.description = description
+            this.priority = priority
+            this.type = chosenHabitType
+            this.countComplete = countComplete
+            this.period = period
+            this.color = chosenColor
+            intentKey = Settings.KEY_EDIT_HABIT_RESULT
+        } ?: run {
             habit = Habit(
                 title,
                 description,
                 priority,
-                HabitType.fromString(chosenHabitType),
+                chosenHabitType,
                 countComplete,
                 period,
                 chosenColor
             )
             intentKey = Settings.KEY_ADD_HABIT_RESULT
-        } else {
-            habit!!.title = title
-            habit!!.description = description
-            habit!!.priority = priority
-            habit!!.type = HabitType.fromString(chosenHabitType)
-            habit!!.countComplete = countComplete
-            habit!!.period = period
-            habit!!.color = chosenColor
-            intentKey = Settings.KEY_EDIT_HABIT_RESULT
         }
 
         val resultIntent = Intent()
@@ -172,11 +158,11 @@ class AddHabitActivity : AppCompatActivity() {
     ) {
         val emptyFieldError = resources.getString(R.string.error_field_empty)
         val failNumberError = resources.getString(R.string.error_field_not_number)
-        if (title == "")
+        if (title.isEmpty())
             binding.editHabitTitle.error = emptyFieldError
-        if (description == "")
+        if (description.isEmpty())
             binding.editHabitDescription.error = emptyFieldError
-        if (priority == "")
+        if (priority.isEmpty())
             binding.editHabitPriority.error = emptyFieldError
         if (countComplete == null)
             binding.editHabitCountComplete.error = failNumberError

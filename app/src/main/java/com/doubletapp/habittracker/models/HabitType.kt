@@ -1,20 +1,10 @@
 package com.doubletapp.habittracker.models
 
-enum class HabitType(val stringType: String) {
-    BAD("Вредная"),
-    NEUTRAL("Нейтральная"),
-    GOOD("Хорошая");
+import com.doubletapp.habittracker.R
 
-    companion object {
-        fun fromString(string: String): HabitType {
-            val stringToType = mapOf(
-                "Вредная" to BAD,
-                "Нейтральная" to NEUTRAL,
-                "Хорошая" to GOOD
-            )
-            if (!stringToType.containsKey(string))
-                throw IllegalArgumentException("Unexpected string of habit type")
-            return stringToType[string] ?: throw NullPointerException("Habit type is null")
-        }
-    }
+enum class HabitType(val resId: Int) {
+    NONE(-1),
+    BAD(R.string.habit_type_bad),
+    NEUTRAL(R.string.habit_type_neutral),
+    GOOD(R.string.habit_type_good)
 }
