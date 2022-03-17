@@ -17,17 +17,16 @@ import androidx.core.content.ContextCompat
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.databinding.ActivityAddHabitBinding
+import com.doubletapp.habittracker.fragments.ColorPickerFragment
+import com.doubletapp.habittracker.fragments.IColorPickerListener
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.util.toEditable
 
-
-class AddHabitActivity : AppCompatActivity() {
+class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
     private lateinit var binding: ActivityAddHabitBinding
-    private lateinit var colors: List<Int>
     private var chosenHabitType = HabitType.NONE
     private var habit: Habit? = null
-    private var chosenColorIndex = -1
     private var chosenColor: Int = Color.WHITE
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,33 +42,25 @@ class AddHabitActivity : AppCompatActivity() {
         binding.habitTypeRadioGroup.setOnCheckedChangeListener { _, i ->
             chosenHabitType = when (i) {
                 R.id.habit_type_radio_bad -> HabitType.BAD
-                R.id.habit_type_radio_neutral -> HabitType.NEUTRAL
                 R.id.habit_type_radio_good -> HabitType.GOOD
                 else -> HabitType.NONE
             }
         }
 
-        val colorNames = resources.getStringArray(R.array.habit_colors)
-        val pickedColors = mutableListOf<Int>()
-        val packageName = packageName
-        colorNames.forEach {
-            val colorId = resources.getIdentifier(it, "color", packageName)
-            pickedColors.add(
-                ContextCompat.getColor(this, colorId)
-            )
-        }
-        colors = pickedColors.toList()
-        for (i in colors.indices) {
-            addColorView(colors[i], i)
-        }
-
         habit = intent.getParcelableExtra(Settings.KEY_EDIT_HABIT)
         habit?.let {
-            setEditableHabit(it)
+            chosenColor = it.color
             toolbar?.title = resources.getString(R.string.toolbar_edit_habit_activity)
             binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
+            setEditableHabit(it)
         }
-        setChosenColor()
+
+        binding.btnShowColorPicker.setOnClickListener {
+            ColorPickerFragment.newInstance(packageName, chosenColor).show(
+                supportFragmentManager,
+                "color_picker_dialog"
+            )
+        }
 
         val types = resources.getStringArray(R.array.habit_priority_spinner)
         val adapter = ArrayAdapter(this, R.layout.spinner_item, types)
@@ -85,7 +76,6 @@ class AddHabitActivity : AppCompatActivity() {
 
         when (habit.type) {
             HabitType.BAD -> binding.habitTypeRadioBad.isChecked = true
-            HabitType.NEUTRAL -> binding.habitTypeRadioNeutral.isChecked = true
             HabitType.GOOD -> binding.habitTypeRadioGood.isChecked = true
             else -> throw IllegalArgumentException("Unexpected habit type")
         }
@@ -93,14 +83,6 @@ class AddHabitActivity : AppCompatActivity() {
 
         binding.editHabitCountComplete.text = habit.countComplete.toString().toEditable()
         binding.editHabitPeriod.text = habit.period.toString().toEditable()
-
-        val indexColor = colors.indexOf(habit.color)
-        chosenColorIndex = indexColor
-        chosenColor = habit.color
-        val colorView = binding.habitColorPickerLayout.findViewById<Button>(indexColor)
-        val bg = getDrawable(R.drawable.chosen_color_shape) as GradientDrawable
-        bg.color = ColorStateList.valueOf(chosenColor)
-        colorView.background = bg
     }
 
     private val btnAddHabitOnClickListener = View.OnClickListener {
@@ -170,63 +152,15 @@ class AddHabitActivity : AppCompatActivity() {
             binding.editHabitPeriod.error = failNumberError
     }
 
-    private fun addColorView(color: Int, index: Int) {
-        val dp = resources.displayMetrics.density
-        val colorView = Button(this)
-        colorView.id = index
-        val layoutParams = ViewGroup.MarginLayoutParams(
-            (56 * dp).toInt(),
-            (56 * dp).toInt()
-        )
-        layoutParams.leftMargin = (7 * dp).toInt()
-        layoutParams.rightMargin = (7 * dp).toInt()
-        colorView.layoutParams = layoutParams
-        val bg = getDrawable(R.drawable.color_shape) as GradientDrawable
-        bg.color = ColorStateList.valueOf(color)
-        colorView.background = bg
-        colorView.setOnClickListener {
-            val currentIndex = it.id
-            if (chosenColorIndex != -1) {
-                val lastColorView = binding.habitColorPickerLayout.findViewById<Button>(chosenColorIndex)
-                val lastBg = getDrawable(R.drawable.color_shape) as GradientDrawable
-                lastBg.color = ColorStateList.valueOf(chosenColor)
-                lastColorView.background = lastBg
-            }
-            chosenColorIndex = currentIndex
-            chosenColor = colors[currentIndex]
-            val chosenBg = getDrawable(R.drawable.chosen_color_shape) as GradientDrawable
-            chosenBg.color = ColorStateList.valueOf(colors[index])
-            it.background = chosenBg
-            setChosenColor()
-        }
-        binding.habitColorPickerLayout.addView(colorView)
-    }
-
-    private fun setChosenColor() {
-        val bg = getDrawable(R.drawable.color_shape) as GradientDrawable
-        bg.color = ColorStateList.valueOf(chosenColor)
-        binding.habitChosenColor.background = bg
-
-        val chosenRgb = arrayOf(
-            Color.red(chosenColor),
-            Color.green(chosenColor),
-            Color.blue(chosenColor)
-        )
-        val chosenHsv = FloatArray(3)
-        Color.colorToHSV(chosenColor, chosenHsv)
-        val chosenRgbText = "R - ${chosenRgb[0]}, G - ${chosenRgb[1]}, B - ${chosenRgb[2]}"
-        val chosenHsvText = "H - ${chosenHsv[0]}, S - ${chosenHsv[1]}, V - ${chosenHsv[2]}"
-        binding.habitChosenColorRgb.text = chosenRgbText
-        binding.habitChosenColorRgb.setTextColor(chosenColor)
-        binding.habitChosenColorHsv.text = chosenHsvText
-        binding.habitChosenColorHsv.setTextColor(chosenColor)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             setResult(Activity.RESULT_CANCELED)
             finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onColorPicked(color: Int) {
+        chosenColor = color
     }
 }
