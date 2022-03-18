@@ -7,7 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
 import com.doubletapp.habittracker.IHabitClickListener
+import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.databinding.ActivityMainBinding
@@ -17,6 +20,24 @@ class MainActivity : AppCompatActivity(), IHabitClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var habitsAdapter: HabitsAdapter
     private val habits = mutableListOf(
+        Habit(
+            "Test habit",
+            "It is test habit. It is created that programmer can test, how recycler view is working",
+            "Средний",
+            com.doubletapp.habittracker.models.HabitType.BAD,
+            5,
+            10,
+            Color.parseColor("#B0E1FC")
+        ),
+        Habit(
+            "Test habit",
+            "It is test habit. It is created that programmer can test, how recycler view is working",
+            "Средний",
+            com.doubletapp.habittracker.models.HabitType.BAD,
+            5,
+            10,
+            Color.parseColor("#B0E1FC")
+        ),
         Habit(
             "Test habit",
             "It is test habit. It is created that programmer can test, how recycler view is working",
@@ -57,6 +78,18 @@ class MainActivity : AppCompatActivity(), IHabitClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.activityMainToolbar)
+        supportActionBar?.title = resources.getString(R.string.app_name)
+
+        val drawerToggle = ActionBarDrawerToggle(
+            this,
+            binding.navigationDrawerLayout,
+            binding.activityMainToolbar,
+            R.string.open_drawer_content,
+            R.string.close_drawer_content
+        )
+        binding.navigationDrawerLayout.addDrawerListener(drawerToggle)
+        drawerToggle.syncState()
 
         if (habits.size != 0) binding.textEmptyHabits.visibility = View.GONE
         habitsAdapter = HabitsAdapter(habits, this)

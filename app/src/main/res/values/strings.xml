@@ -47,4 +47,9 @@
         <item>blue</item>
         <item>dull_green</item>
     </string-array>
+
+    <string name="menu_item_home">Домашний экран</string>
+    <string name="menu_item_app_info">Информация о приложении</string>
+    <string name="open_drawer_content">Navigation opened</string>
+    <string name="close_drawer_content">Navigation closed</string>
 </resources>
