@@ -13,8 +13,11 @@ import com.doubletapp.habittracker.IHabitClickListener
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.Settings
+import com.doubletapp.habittracker.adapters.HabitsPagerAdapter
 import com.doubletapp.habittracker.databinding.ActivityMainBinding
 import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.util.sortByType
+import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity(), IHabitClickListener {
     private lateinit var binding: ActivityMainBinding
@@ -33,7 +36,7 @@ class MainActivity : AppCompatActivity(), IHabitClickListener {
             "Test habit",
             "It is test habit. It is created that programmer can test, how recycler view is working",
             "Средний",
-            com.doubletapp.habittracker.models.HabitType.BAD,
+            com.doubletapp.habittracker.models.HabitType.GOOD,
             5,
             10,
             Color.parseColor("#B0E1FC")
@@ -91,9 +94,15 @@ class MainActivity : AppCompatActivity(), IHabitClickListener {
         binding.navigationDrawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
-        if (habits.size != 0) binding.textEmptyHabits.visibility = View.GONE
-        habitsAdapter = HabitsAdapter(habits, this)
-        binding.habitsList.adapter = habitsAdapter
+        val sortedHabits = habits.sortByType()
+        val tabNames = resources.getStringArray(R.array.tab_names)
+        binding.viewPager.adapter = HabitsPagerAdapter(this, sortedHabits)
+        TabLayoutMediator(
+            binding.habitTabs,
+            binding.viewPager
+        ) { tab, position ->
+            tab.text = tabNames[position]
+        }.attach()
 
         binding.fabAddHabit.setOnClickListener {
             val openAddHabitActivity = Intent(this, AddHabitActivity::class.java)

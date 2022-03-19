@@ -52,4 +52,9 @@
     <string name="menu_item_app_info">Информация о приложении</string>
     <string name="open_drawer_content">Navigation opened</string>
     <string name="close_drawer_content">Navigation closed</string>
+
+    <string-array name="tab_names">
+        <item>Хорошие привычки</item>
+        <item>Вредные привычки</item>
+    </string-array>
 </resources>
