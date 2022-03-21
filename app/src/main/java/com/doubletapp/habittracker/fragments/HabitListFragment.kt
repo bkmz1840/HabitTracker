@@ -1,25 +1,55 @@
 package com.doubletapp.habittracker.fragments
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import com.doubletapp.habittracker.IHabitClickListener
+import com.doubletapp.habittracker.Settings
+import com.doubletapp.habittracker.activities.AddHabitActivity
 import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.databinding.FragmentHabitListBinding
 import com.doubletapp.habittracker.models.Habit
 import java.util.ArrayList
 
+interface IHabitChangeListener {
+    fun onHabitChange(habit: Habit, position: Int)
+}
+
 class HabitListFragment : Fragment(), IHabitClickListener {
+    private lateinit var callback: IHabitChangeListener
     private lateinit var binding: FragmentHabitListBinding
-    private var habits: List<Habit> = listOf()
+    private var habits: MutableList<Habit> = mutableListOf()
     private lateinit var habitsAdapter: HabitsAdapter
+    private var lastClickedHabitPosition: Int = -1
+    private val resultLauncherEditHabit = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            result ->
+        if (result.resultCode == Activity.RESULT_OK && lastClickedHabitPosition != -1) {
+            result.data?.let {
+                val editedHabit = it.getParcelableExtra<Habit>(Settings.KEY_EDIT_HABIT_RESULT)
+                if (editedHabit != null) {
+                    habits[lastClickedHabitPosition] = editedHabit
+                    habitsAdapter.notifyItemChanged(lastClickedHabitPosition)
+                    callback.onHabitChange(editedHabit, lastClickedHabitPosition)
+                }
+            }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callback = activity as IHabitChangeListener
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            habits = it.getParcelableArrayList<Habit>(ARG_HABITS)?.toList() ?: listOf()
+            habits = it.getParcelableArrayList<Habit>(ARG_HABITS)?.toMutableList() ?: mutableListOf()
         }
     }
 
@@ -45,7 +75,16 @@ class HabitListFragment : Fragment(), IHabitClickListener {
     }
 
     override fun onHabitClick(position: Int) {
-        TODO("Not yet implemented")
+        lastClickedHabitPosition = position
+        val habit = habits.getOrNull(position) ?: throw NullPointerException("Clicked habit not found")
+        val openEditHabit = Intent(context, AddHabitActivity::class.java)
+        openEditHabit.putExtra(Settings.KEY_EDIT_HABIT, habit)
+        resultLauncherEditHabit.launch(openEditHabit)
+    }
+
+    fun addNewHabit(habit: Habit) {
+        habits.add(habit)
+        habitsAdapter.notifyItemInserted(habits.lastIndex)
     }
 
     companion object {
