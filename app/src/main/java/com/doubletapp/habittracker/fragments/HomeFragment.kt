@@ -77,7 +77,12 @@ class HomeFragment : Fragment(), IHabitChangeListener {
             habits[HabitType.GOOD]?.toList() ?: listOf(),
             habits[HabitType.BAD]?.toList() ?: listOf(),
         )
-        pagerAdapter = HabitsPagerAdapter(activity as FragmentActivity, pages, this)
+        pagerAdapter = HabitsPagerAdapter(
+            activity as FragmentActivity,
+            pages,
+            this,
+            activity?.supportFragmentManager
+        )
         binding.viewPager.adapter = pagerAdapter
         TabLayoutMediator(
             binding.habitTabs,
