@@ -1,7 +1,6 @@
 package com.doubletapp.habittracker.fragments
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -21,8 +20,7 @@ interface IHabitChangeListener {
     fun onHabitChange(habit: Habit, position: Int)
 }
 
-class HabitListFragment : Fragment(), IHabitClickListener {
-    private lateinit var callback: IHabitChangeListener
+class HabitListFragment(private val callback: IHabitChangeListener) : Fragment(), IHabitClickListener {
     private lateinit var binding: FragmentHabitListBinding
     private var habits: MutableList<Habit> = mutableListOf()
     private lateinit var habitsAdapter: HabitsAdapter
@@ -39,11 +37,6 @@ class HabitListFragment : Fragment(), IHabitClickListener {
                 }
             }
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        callback = activity as IHabitChangeListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,8 +84,8 @@ class HabitListFragment : Fragment(), IHabitClickListener {
         private const val ARG_HABITS = "HABITS"
 
         @JvmStatic
-        fun newInstance(habits: List<Habit>) =
-            HabitListFragment().apply {
+        fun newInstance(habits: List<Habit>, callback: IHabitChangeListener) =
+            HabitListFragment(callback).apply {
                 arguments = Bundle().apply {
                     putParcelableArrayList(ARG_HABITS, ArrayList(habits))
                 }
