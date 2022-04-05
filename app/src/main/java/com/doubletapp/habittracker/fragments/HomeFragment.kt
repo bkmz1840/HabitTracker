@@ -16,6 +16,7 @@ import com.doubletapp.habittracker.activities.AddHabitActivity
 import com.doubletapp.habittracker.adapters.HabitsPagerAdapter
 import com.doubletapp.habittracker.databinding.FragmentHomeBinding
 import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.models.HabitList
 import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.util.sortByType
 import com.google.android.material.tabs.TabLayoutMediator
@@ -23,14 +24,14 @@ import com.google.android.material.tabs.TabLayoutMediator
 class HomeFragment : Fragment(), IHabitChangeListener {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var pagerAdapter: HabitsPagerAdapter
-    private var habits: Map<HabitType, MutableList<Habit>> = mapOf()
+    private var habits: HabitList = HabitList(mutableListOf(), mutableListOf())
     private val resultLauncherAddHabit = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.let {
                 val habit = it.getParcelableExtra<Habit>(Settings.KEY_ADD_HABIT_RESULT)
                 if (habit != null) {
-                    habits[habit.type]?.add(habit)
+                    habits.addHabit(habit)
                     pagerAdapter.addNewHabit(habit)
                 }
             }
@@ -73,13 +74,9 @@ class HomeFragment : Fragment(), IHabitChangeListener {
         )
         habits = habitsList.sortByType()
         val tabNames = resources.getStringArray(R.array.tab_names)
-        val pages = listOf(
-            habits[HabitType.GOOD]?.toList() ?: listOf(),
-            habits[HabitType.BAD]?.toList() ?: listOf(),
-        )
         pagerAdapter = HabitsPagerAdapter(
             activity as FragmentActivity,
-            pages,
+            habits,
             this,
             activity?.supportFragmentManager
         )
@@ -98,8 +95,6 @@ class HomeFragment : Fragment(), IHabitChangeListener {
     }
 
     override fun onHabitChange(habit: Habit, position: Int) {
-        habits[habit.type]?.let {
-            it[position] = habit
-        }
+        habits.updateHabit(habit, position)
     }
 }

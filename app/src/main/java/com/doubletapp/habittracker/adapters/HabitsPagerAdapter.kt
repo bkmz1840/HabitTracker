@@ -7,18 +7,20 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.doubletapp.habittracker.fragments.HabitListFragment
 import com.doubletapp.habittracker.fragments.IHabitChangeListener
 import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.models.HabitList
 import com.doubletapp.habittracker.models.HabitType
 
 class HabitsPagerAdapter(
     fragmentActivity: FragmentActivity,
-    private val habitsList: List<List<Habit>>,
+    private val habitsList: HabitList,
     private val habitChangeListener: IHabitChangeListener,
     private val fragmentManager: FragmentManager?,
 ): FragmentStateAdapter(fragmentActivity) {
-    override fun getItemCount(): Int = habitsList.size
+    override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment = HabitListFragment.newInstance(
-        habitsList[position], habitChangeListener
+        habitsList.getHabitsByType(habitTypeByPosition[position] ?: HabitType.NONE),
+        habitChangeListener
     )
 
     fun addNewHabit(habit: Habit) {
@@ -32,6 +34,11 @@ class HabitsPagerAdapter(
     }
 
     companion object {
+        private val habitTypeByPosition: Map<Int, HabitType> = mapOf(
+            0 to HabitType.GOOD,
+            1 to HabitType.BAD,
+        )
+
         private val positionByHabitType: Map<HabitType, Int> = mapOf(
             HabitType.GOOD to 0,
             HabitType.BAD to 1,

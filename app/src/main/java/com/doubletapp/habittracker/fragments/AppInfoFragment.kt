@@ -27,7 +27,6 @@ class AppInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val appVersion = resources.getString(R.string.version) + " " + BuildConfig.VERSION_NAME
-        binding.appVersion.text = appVersion
+        binding.appVersion.text = resources.getString(R.string.version, BuildConfig.VERSION_NAME)
     }
 }
