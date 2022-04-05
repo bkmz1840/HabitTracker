@@ -26,6 +26,8 @@
     <string name="toast_fail_add_habit">Не все поля заполнены или заполнены неправильно</string>
     <string name="error_field_empty">Данное поле не может быть пустым</string>
     <string name="error_field_not_number">Не похоже на число</string>
+    <string name="btn_show_color_picker">Выбрать цвет карточки с привычкой</string>
+    <string name="btn_confirm_chosen_color">Подтвердить выбор</string>
 
     <string-array name="habit_colors">
         <item>yellow</item>
@@ -44,5 +46,15 @@
         <item>dull_red</item>
         <item>blue</item>
         <item>dull_green</item>
+    </string-array>
+
+    <string name="menu_item_home">Домашний экран</string>
+    <string name="menu_item_app_info">Информация о приложении</string>
+    <string name="open_drawer_content">Navigation opened</string>
+    <string name="close_drawer_content">Navigation closed</string>
+
+    <string-array name="tab_names">
+        <item>Хорошие привычки</item>
+        <item>Вредные привычки</item>
     </string-array>
 </resources>

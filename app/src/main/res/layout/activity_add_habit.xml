@@ -97,11 +97,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/habit_type_bad"/>
             <androidx.appcompat.widget.AppCompatRadioButton
-                    android:id="@+id/habit_type_radio_neutral"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/habit_type_neutral"/>
-            <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/habit_type_radio_good"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -148,69 +143,13 @@
                     android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-                android:id="@+id/habit_color_picker_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size"
-                android:textColor="@color/black"
-                android:text="@string/habit_color_picker_label"
-                app:layout_constraintTop_toBottomOf="@id/edit_habit_period_layout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        <HorizontalScrollView
-                android:id="@+id/habit_color_picker"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:layout_constraintTop_toBottomOf="@id/habit_color_picker_label"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-            <LinearLayout
-                    android:id="@+id/habit_color_picker_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"/>
-        </HorizontalScrollView>
-
-        <TextView
-                android:id="@+id/habit_chosen_color_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size"
-                android:text="@string/habit_color_picker_chosen_color_text"
-                app:layout_constraintTop_toBottomOf="@id/habit_color_picker"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
         <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/habit_chosen_color"
+                android:id="@+id/btn_show_color_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/habit_chosen_color_header"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        <TextView
-                android:id="@+id/habit_chosen_color_rgb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size"
-                android:gravity="center_horizontal"
-                app:layout_constraintTop_toBottomOf="@id/habit_chosen_color"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        <TextView
-                android:id="@+id/habit_chosen_color_hsv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size"
-                android:gravity="center_horizontal"
-                app:layout_constraintTop_toBottomOf="@id/habit_chosen_color_rgb"
+                android:layout_marginTop="20dp"
+                android:text="@string/btn_show_color_picker"
+                app:layout_constraintTop_toBottomOf="@id/edit_habit_period_layout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -221,7 +160,7 @@
                 android:text="@string/btn_add_habit"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
-                app:layout_constraintTop_toBottomOf="@id/habit_chosen_color_hsv"
+                app:layout_constraintTop_toBottomOf="@id/btn_show_color_picker"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
