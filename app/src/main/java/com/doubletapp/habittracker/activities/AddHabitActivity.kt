@@ -33,11 +33,11 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
         super.onCreate(savedInstanceState)
         binding = ActivityAddHabitBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val toolbar = supportActionBar
-        toolbar?.title = resources.getString(R.string.toolbar_add_habit_activity)
-        toolbar?.setDisplayHomeAsUpEnabled(true)
-        toolbar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.let {
+            it.title = resources.getString(R.string.toolbar_add_habit_activity)
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setDisplayShowHomeEnabled(true)
+        }
 
         binding.habitTypeRadioGroup.setOnCheckedChangeListener { _, i ->
             chosenHabitType = when (i) {
@@ -46,26 +46,22 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
                 else -> HabitType.NONE
             }
         }
-
         habit = intent.getParcelableExtra(Settings.KEY_EDIT_HABIT)
         habit?.let {
             chosenColor = it.color
-            toolbar?.title = resources.getString(R.string.toolbar_edit_habit_activity)
+            supportActionBar?.title = resources.getString(R.string.toolbar_edit_habit_activity)
             binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
             setEditableHabit(it)
         }
-
         binding.btnShowColorPicker.setOnClickListener {
             ColorPickerFragment.newInstance(packageName, chosenColor).show(
                 supportFragmentManager,
                 "color_picker_dialog"
             )
         }
-
         val types = resources.getStringArray(R.array.habit_priority_spinner)
         val adapter = ArrayAdapter(this, R.layout.spinner_item, types)
         binding.editHabitPriority.setAdapter(adapter)
-
         binding.btnAddHabit.setOnClickListener(btnAddHabitOnClickListener)
     }
 
@@ -101,7 +97,20 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
             setErrors(title, description, priority, countComplete, period)
             return@OnClickListener
         }
+        val intentKey = updateHabit(title, description, priority, countComplete, period)
+        val resultIntent = Intent()
+        resultIntent.putExtra(intentKey, habit)
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
+    }
 
+    private fun updateHabit(
+        title: String,
+        description: String,
+        priority: String,
+        countComplete: Int,
+        period: Int
+    ): String {
         var intentKey = ""
         habit?.apply {
             this.title = title
@@ -124,11 +133,7 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
             )
             intentKey = Settings.KEY_ADD_HABIT_RESULT
         }
-
-        val resultIntent = Intent()
-        resultIntent.putExtra(intentKey, habit)
-        setResult(Activity.RESULT_OK, resultIntent)
-        finish()
+        return intentKey
     }
 
     private fun setErrors(

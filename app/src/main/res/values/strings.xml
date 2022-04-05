@@ -57,4 +57,14 @@
         <item>Хорошие привычки</item>
         <item>Вредные привычки</item>
     </string-array>
+
+    <string name="nav_home_label">Трекер привычек</string>
+    <string name="nav_app_info_label">Информация о приложении</string>
+
+    <string name="app_description">
+        "Трекер привычек" поможет вам завести и поддерживать полезные привычки,
+        позволяя достичь долгосрочных целей. Также вы можете добавить свои вредные привычки,
+        а приложение поможет вам помнить о них и избавляться.
+    </string>
+    <string name="version">Версия: %s</string>
 </resources>
