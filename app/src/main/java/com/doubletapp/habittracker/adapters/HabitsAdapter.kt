@@ -20,9 +20,14 @@ class HabitDiffCallback : DiffUtil.ItemCallback<Habit>() {
 }
 
 class HabitsAdapter(
-    private val habits: List<Habit>,
+    _habits: List<Habit>,
     private val onHabitClickListener: IHabitClickListener
 ): ListAdapter<Habit, HabitsViewHolder>(HabitDiffCallback()) {
+    var habits: List<Habit> = _habits
+        set(value) {
+            field = value
+            notifyItemRangeChanged(0, value.size)
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
