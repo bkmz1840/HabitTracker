@@ -26,7 +26,7 @@ class HabitsAdapter(
     var habits: List<Habit> = _habits
         set(value) {
             field = value
-            notifyItemRangeChanged(0, value.size)
+            notifyDataSetChanged()
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitsViewHolder {

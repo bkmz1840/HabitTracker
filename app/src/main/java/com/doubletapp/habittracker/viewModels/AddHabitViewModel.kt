@@ -11,7 +11,7 @@ class AddHabitViewModel(
     private var habit: Habit?
 ): ViewModel() {
     var habitType = habit?.type ?: HabitType.NONE
-    var habitColor = Color.WHITE
+    var habitColor = habit?.color ?: Color.WHITE
 
     fun uploadHabit(
         title: String,

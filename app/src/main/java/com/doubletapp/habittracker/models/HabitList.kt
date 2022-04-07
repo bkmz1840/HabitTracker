@@ -2,6 +2,8 @@ package com.doubletapp.habittracker.models
 
 import android.graphics.Color
 import com.doubletapp.habittracker.util.sortByType
+import java.util.*
+import kotlin.NoSuchElementException
 
 interface IHabitsRepo {
     val observers: MutableList<IHabitsRepoListener>
@@ -58,27 +60,59 @@ class HabitList(
         else -> throw IllegalArgumentException("Unexpected habit type: $habitType")
     }
 
+    fun getAllHabits(): List<Habit> = goodHabits + badHabits
+
+    fun filterHabitsByTitle(title: String): HabitList {
+        val filter = { habit: Habit ->
+            habit.title.contains(title.lowercase(Locale.getDefault()), true)
+        }
+        val filteredGoodHabits = goodHabits.filter(filter).toMutableList()
+        val filteredBadHabits = badHabits.filter(filter).toMutableList()
+        return HabitList(filteredGoodHabits, filteredBadHabits)
+    }
+
+    fun sortByPriority(): HabitList {
+        val sortFunc = { habit: Habit ->
+            when (habit.priority) {
+                "Низкий" -> -1
+                "Средний" -> 0
+                "Высокий" -> 1
+                else -> throw IllegalArgumentException("Unexpected habit prioryty ${habit.priority}")
+            }
+        }
+        val sortedGoodHabits = goodHabits.sortedByDescending(sortFunc).toMutableList()
+        val sortedBadHabits = badHabits.sortedByDescending(sortFunc).toMutableList()
+        return HabitList(sortedGoodHabits, sortedBadHabits)
+    }
+
     companion object : IHabitsRepo {
         private val HABITS = mutableListOf(
             Habit(
                 1,
-                "Test habit",
+                "First test habit",
                 "It is test habit. It is created that programmer can test, how recycler view is working",
-                "Средний", HabitType.BAD, 5, 10,
+                "Низкий", HabitType.BAD, 5, 10,
                 Color.parseColor("#B0E1FC")
             ),
             Habit(
                 2,
-                "Test habit",
+                "Second test habit",
                 "It is test habit. It is created that programmer can test, how recycler view is working",
                 "Средний", HabitType.GOOD, 5, 10,
                 Color.parseColor("#B0E1FC")
             ),
             Habit(
                 3,
-                "Test habit",
+                "Third test habit",
                 "It is test habit. It is created that programmer can test, how recycler view is working",
-                "Средний", HabitType.BAD, 5, 10,
+                "Высокий", HabitType.BAD, 5, 10,
+                Color.parseColor("#B0E1FC")
+            ),
+            Habit(
+                4,
+                "First another test habit",
+                "It is test habit. It is created that programmer can test, how recycler view is working",
+                "Высокий", HabitType.GOOD, 5, 10,
                 Color.parseColor("#B0E1FC")
             )
         )

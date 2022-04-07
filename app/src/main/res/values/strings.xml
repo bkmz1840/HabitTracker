@@ -59,6 +59,7 @@
     </string-array>
 
     <string name="nav_home_label">Трекер привычек</string>
+    <string name="nav_search_label">Поиск привычки</string>
     <string name="nav_app_info_label">Информация о приложении</string>
 
     <string name="app_description">
@@ -67,4 +68,10 @@
         а приложение поможет вам помнить о них и избавляться.
     </string>
     <string name="version">Версия: %s</string>
+
+    <string name="main_toolbar_search_title">Поиск</string>
+    <string name="search_empty">Ни одна привычка по такому запросу не была найдена</string>
+    <string name="search_bottom_sheet_header">Фильтры и сортировки</string>
+    <string name="search_bottom_sheet_btn_sort">Сортировать по приоритету</string>
+    <string name="search_bottom_sheet_edit_search_title">Название привычки</string>
 </resources>
