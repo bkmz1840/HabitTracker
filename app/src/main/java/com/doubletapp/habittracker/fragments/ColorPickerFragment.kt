@@ -1,6 +1,5 @@
 package com.doubletapp.habittracker.fragments
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -18,18 +17,14 @@ interface IColorPickerListener {
     fun onColorPicked(color: Int)
 }
 
-class ColorPickerFragment : DialogFragment() {
+class ColorPickerFragment(
+    private val callback: IColorPickerListener
+) : DialogFragment() {
     private lateinit var packageName: String
     private lateinit var binding: FragmentColorPickerBinding
     private lateinit var colors: List<Int>
     private var chosenColor: Int = Color.WHITE
     private var chosenColorIndex: Int = -1
-    private var callback: IColorPickerListener? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        callback = activity as IColorPickerListener
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +73,7 @@ class ColorPickerFragment : DialogFragment() {
             setChosenColor()
         }
         binding.btnConfirmColor.setOnClickListener {
-            callback?.onColorPicked(chosenColor)
+            callback.onColorPicked(chosenColor)
             super.dismiss()
         }
     }
@@ -140,8 +135,8 @@ class ColorPickerFragment : DialogFragment() {
         private const val ARG_COLOR = "COLOR"
 
         @JvmStatic
-        fun newInstance(packageName: String, color: Int) =
-            ColorPickerFragment().apply {
+        fun newInstance(packageName: String, color: Int, callback: IColorPickerListener) =
+            ColorPickerFragment(callback).apply {
                 arguments = Bundle().apply {
                     putString(ARG_PACKAGE_NAME, packageName)
                     putInt(ARG_COLOR, color)

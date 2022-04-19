@@ -29,4 +29,11 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+    <fragment
+            android:id="@+id/fragment_search_habit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="com.doubletapp.habittracker.fragments.SearchHabitFragment"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
