@@ -1,14 +1,13 @@
 package com.doubletapp.habittracker.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.fragment.findNavController
 import com.doubletapp.habittracker.R
-import com.doubletapp.habittracker.activities.AddHabitActivity
 import com.doubletapp.habittracker.adapters.HabitsPagerAdapter
 import com.doubletapp.habittracker.databinding.FragmentHomeBinding
 import com.doubletapp.habittracker.models.HabitType
@@ -47,8 +46,7 @@ class HomeFragment : Fragment() {
         }.attach()
 
         binding.fabAddHabit.setOnClickListener {
-            val openAddHabitActivity = Intent(activity, AddHabitActivity::class.java)
-            startActivity(openAddHabitActivity)
+            findNavController().navigate(R.id.nav_add_habit)
         }
     }
 }

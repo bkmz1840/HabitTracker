@@ -6,20 +6,19 @@ import androidx.lifecycle.ViewModel
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitList
 import com.doubletapp.habittracker.models.HabitType
-import com.doubletapp.habittracker.models.IHabitsRepoListener
+import com.doubletapp.habittracker.models.HabitsRepo
 
-class HabitListViewModel: ViewModel(), IHabitsRepoListener {
+class HabitListViewModel: ViewModel() {
     private val _habits = MutableLiveData<HabitList>()
     val habits: LiveData<HabitList> = _habits
 
     init {
-        HabitList.addObserver(this)
         loadHabits()
     }
 
-    private fun getHabits(): HabitList = HabitList.loadHabits()
+    private fun getHabits(): HabitList = HabitsRepo.loadHabits()
 
-    private fun loadHabits() {
+    fun loadHabits() {
         _habits.postValue(getHabits())
     }
 
@@ -33,22 +32,13 @@ class HabitListViewModel: ViewModel(), IHabitsRepoListener {
         if (title.isEmpty())
             _habits.postValue(habits)
         else {
-            val filteredHabits = habits.filterHabitsByTitle(title)
+            val filteredHabits = HabitsRepo.filterHabitsByTitle(title)
             _habits.postValue(filteredHabits)
         }
     }
 
     fun sortHabitsByPriority() {
-        val habits = getHabits().sortByPriority()
-        _habits.postValue(habits)
-    }
-
-    override fun updateHabits(habits: HabitList) {
-        _habits.postValue(habits)
-    }
-
-    override fun onCleared() {
-        HabitList.removeObserver(this)
-        super.onCleared()
+        val sortedHabits = HabitsRepo.sortByPriority()
+        _habits.postValue(sortedHabits)
     }
 }

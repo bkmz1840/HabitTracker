@@ -1,56 +1,57 @@
-package com.doubletapp.habittracker.activities
+package com.doubletapp.habittracker.fragments
 
-import android.app.Activity
-import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.*
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.MenuItem
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
-import com.doubletapp.habittracker.databinding.ActivityAddHabitBinding
-import com.doubletapp.habittracker.fragments.ColorPickerFragment
-import com.doubletapp.habittracker.fragments.IColorPickerListener
+import com.doubletapp.habittracker.databinding.FragmentAddHabitBinding
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.util.toEditable
 import com.doubletapp.habittracker.viewModels.AddHabitViewModel
 
-class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
-    private lateinit var binding: ActivityAddHabitBinding
+class AddHabitFragment : Fragment(), IColorPickerListener {
+    private lateinit var binding: FragmentAddHabitBinding
     private lateinit var viewModel: AddHabitViewModel
+    private var habitId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddHabitBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        supportActionBar?.let {
-            it.title = resources.getString(R.string.toolbar_add_habit_activity)
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setDisplayShowHomeEnabled(true)
+        arguments?.let {
+            habitId = it.getInt(Settings.KEY_EDIT_HABIT_ID)
         }
+    }
 
-        val habit = intent.getParcelableExtra<Habit>(Settings.KEY_EDIT_HABIT)
-        habit?.let {
-            supportActionBar?.title = resources.getString(R.string.toolbar_edit_habit_activity)
-            binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
-            setEditableHabit(it)
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentAddHabitBinding.inflate(
+            inflater,
+            container,
+            false
+        )
         viewModel = ViewModelProvider(this, object: ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-                AddHabitViewModel(habit) as T
+                AddHabitViewModel(habitId) as T
         }).get(AddHabitViewModel::class.java)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.habit?.let {
+            setEditableHabit(it)
+            binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
+        }
         binding.habitTypeRadioGroup.setOnCheckedChangeListener { _, i ->
             viewModel.habitType = when (i) {
                 R.id.habit_type_radio_bad -> HabitType.BAD
@@ -58,15 +59,12 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
                 else -> HabitType.NONE
             }
         }
-        binding.btnShowColorPicker.setOnClickListener {
-            ColorPickerFragment.newInstance(packageName, viewModel.habitColor).show(
-                supportFragmentManager,
-                "color_picker_dialog"
-            )
+        binding.btnShowColorPicker.setOnClickListener(btnShowColorPicker)
+        activity?.let {
+            val types = resources.getStringArray(R.array.habit_priority_spinner)
+            val adapter = ArrayAdapter(it, R.layout.spinner_item, types)
+            binding.editHabitPriority.setAdapter(adapter)
         }
-        val types = resources.getStringArray(R.array.habit_priority_spinner)
-        val adapter = ArrayAdapter(this, R.layout.spinner_item, types)
-        binding.editHabitPriority.setAdapter(adapter)
         binding.btnAddHabit.setOnClickListener(btnAddHabitOnClickListener)
     }
 
@@ -94,7 +92,7 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
         if (title.isEmpty() || description.isEmpty() || priority.isEmpty()
             || countComplete == null || period == null || viewModel.habitType == HabitType.NONE) {
             Toast.makeText(
-                this@AddHabitActivity,
+                context,
                 resources.getString(R.string.toast_fail_add_habit),
                 Toast.LENGTH_SHORT
             ).show()
@@ -102,7 +100,20 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
             return@OnClickListener
         }
         viewModel.uploadHabit(title, description, priority, countComplete, period)
-        finish()
+        findNavController().navigateUp()
+    }
+
+    private val btnShowColorPicker = View.OnClickListener {
+        activity?.let {
+            ColorPickerFragment.newInstance(
+                it.packageName,
+                viewModel.habitColor,
+                this
+            ).show(
+                it.supportFragmentManager,
+                "color_picker_dialog"
+            )
+        }
     }
 
     private fun setErrors(
@@ -124,14 +135,6 @@ class AddHabitActivity : AppCompatActivity(), IColorPickerListener {
             binding.editHabitCountComplete.error = failNumberError
         if (period == null)
             binding.editHabitPeriod.error = failNumberError
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onColorPicked(color: Int) {

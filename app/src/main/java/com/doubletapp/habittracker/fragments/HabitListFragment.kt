@@ -1,15 +1,15 @@
 package com.doubletapp.habittracker.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.doubletapp.habittracker.IHabitClickListener
+import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
-import com.doubletapp.habittracker.activities.AddHabitActivity
 import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.databinding.FragmentHabitListBinding
 import com.doubletapp.habittracker.models.HabitType
@@ -55,9 +55,9 @@ class HabitListFragment: Fragment(), IHabitClickListener {
 
     override fun onHabitClick(position: Int) {
         val habit = viewModel.getHabit(habitType, position)
-        val openEditHabit = Intent(context, AddHabitActivity::class.java)
-        openEditHabit.putExtra(Settings.KEY_EDIT_HABIT, habit)
-        startActivity(openEditHabit)
+        val bundle = Bundle()
+        bundle.putInt(Settings.KEY_EDIT_HABIT_ID, habit.id)
+        findNavController().navigate(R.id.nav_add_habit, bundle)
     }
 
     companion object {

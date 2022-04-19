@@ -6,12 +6,23 @@ import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitList
 import com.doubletapp.habittracker.models.HabitType
+import com.doubletapp.habittracker.models.HabitsRepo
 
 class AddHabitViewModel(
-    private var habit: Habit?
+    habitId: Int?
 ): ViewModel() {
-    var habitType = habit?.type ?: HabitType.NONE
-    var habitColor = habit?.color ?: Color.WHITE
+    var habit: Habit? = null
+    var habitType = HabitType.NONE
+    var habitColor = Color.WHITE
+
+    init {
+        habitId?.let {
+            val loadedHabit = HabitsRepo.getHabit(it)
+            habit = loadedHabit
+            habitType = loadedHabit.type
+            habitColor = loadedHabit.color
+        }
+    }
 
     fun uploadHabit(
         title: String,
@@ -20,6 +31,7 @@ class AddHabitViewModel(
         countComplete: Int,
         period: Int
     ) {
+
         habit?.let {
             it.title = title
             it.description = description
@@ -28,9 +40,9 @@ class AddHabitViewModel(
             it.countComplete = countComplete
             it.period = period
             it.color = habitColor
-            HabitList.updateHabit(it, it.id)
+            HabitsRepo.updateHabit(it, it.id)
         } ?: run {
-            val id = HabitList.lastId + 1
+            val id = HabitsRepo.lastId + 1
             habit = Habit(
                 id,
                 title,
@@ -41,7 +53,7 @@ class AddHabitViewModel(
                 period,
                 habitColor
             )
-            habit?.let{ HabitList.addHabit(it) }
+            habit?.let{ HabitsRepo.addHabit(it) }
         }
     }
 }

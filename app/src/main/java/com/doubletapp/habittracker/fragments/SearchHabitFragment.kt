@@ -8,15 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.doubletapp.habittracker.IHabitClickListener
-import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.databinding.FragmentSearchHabitBinding
 import com.doubletapp.habittracker.viewModels.HabitListViewModel
 
-class SearchHabitFragment : Fragment(), IHabitClickListener {
+class SearchHabitFragment : Fragment() {
     private lateinit var binding: FragmentSearchHabitBinding
     private val viewModel: HabitListViewModel by activityViewModels()
-    private var habitsAdapter = HabitsAdapter(listOf(), this)
 
     private val searchHabitTitleTextWatcher = object: TextWatcher {
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -43,23 +40,10 @@ class SearchHabitFragment : Fragment(), IHabitClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.habits.observe(viewLifecycleOwner) {
-            val habits = it.getAllHabits()
-            if (habits.isNotEmpty()) {
-                binding.textEmptyHabits.visibility = View.GONE
-            } else {
-                binding.textEmptyHabits.visibility = View.VISIBLE
-            }
-            habitsAdapter.habits = habits
-        }
-        binding.searchedHabitList.adapter = habitsAdapter
+        viewModel.loadHabits()
         binding.editSearchTitle.addTextChangedListener(searchHabitTitleTextWatcher)
         binding.btnSortHabits.setOnClickListener {
             viewModel.sortHabitsByPriority()
         }
-    }
-
-    override fun onHabitClick(position: Int) {
-        println()
     }
 }
