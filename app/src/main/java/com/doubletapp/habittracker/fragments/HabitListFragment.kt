@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.doubletapp.habittracker.IHabitClickListener
@@ -12,13 +13,15 @@ import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.databinding.FragmentHabitListBinding
+import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitType
+import com.doubletapp.habittracker.util.sortByType
 import com.doubletapp.habittracker.viewModels.HabitListViewModel
 
 class HabitListFragment: Fragment(), IHabitClickListener {
     private lateinit var binding: FragmentHabitListBinding
     private var habitType: HabitType = HabitType.NONE
-    private lateinit var viewModel: HabitListViewModel
+    private val viewModel: HabitListViewModel by activityViewModels()
     private var habitsAdapter = HabitsAdapter(listOf(), this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,14 +40,14 @@ class HabitListFragment: Fragment(), IHabitClickListener {
             container,
             false
         )
-        viewModel = ViewModelProvider(this).get(HabitListViewModel::class.java)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.habits.observe(viewLifecycleOwner) {
-            val habits = it.getHabitsByType(habitType)
+            if (it == null) return@observe
+            val habits = it.sortByType().getHabitsByType(habitType)
             if (habits.isNotEmpty()) {
                 binding.textEmptyHabits.visibility = View.GONE
             }
@@ -53,10 +56,9 @@ class HabitListFragment: Fragment(), IHabitClickListener {
         binding.habitsList.adapter = habitsAdapter
     }
 
-    override fun onHabitClick(position: Int) {
-        val habit = viewModel.getHabit(habitType, position)
+    override fun onHabitClick(habit: Habit) {
         val bundle = Bundle()
-        bundle.putInt(Settings.KEY_EDIT_HABIT_ID, habit.id)
+        habit.id?.let { bundle.putInt(Settings.KEY_EDIT_HABIT_ID, it) }
         findNavController().navigate(R.id.nav_add_habit, bundle)
     }
 

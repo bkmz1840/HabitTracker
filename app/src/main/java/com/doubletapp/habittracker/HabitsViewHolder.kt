@@ -5,7 +5,7 @@ import com.doubletapp.habittracker.databinding.HabitBinding
 import com.doubletapp.habittracker.models.Habit
 
 interface IHabitClickListener {
-    fun onHabitClick(position: Int)
+    fun onHabitClick(habit: Habit)
 }
 
 class HabitsViewHolder(
@@ -28,7 +28,7 @@ class HabitsViewHolder(
         binding.habitPeriod.text = periodValue
 
         itemView.setOnClickListener {
-            onHabitClickListener.onHabitClick(adapterPosition)
+            onHabitClickListener.onHabitClick(habit)
         }
     }
 }
