@@ -30,12 +30,11 @@ class HabitListViewModel: ViewModel() {
                 "Низкий" -> -1
                 "Средний" -> 0
                 "Высокий" -> 1
-                else -> throw IllegalArgumentException("Unexpected habit prioryty ${habit.priority}")
+                else -> throw IllegalArgumentException("Unexpected habit priority ${habit.priority}")
             }
         }
-        val sortedHabits = habits.value?.sortedByDescending(sortFunc)
-        sortedHabits?.let {
-            _habits.postValue(sortedHabits)
+        habits.value?.sortedByDescending(sortFunc)?.let {
+            _habits.postValue(it)
         }
     }
 }

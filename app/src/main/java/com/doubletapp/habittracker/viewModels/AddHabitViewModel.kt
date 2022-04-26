@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitType
+import com.doubletapp.habittracker.models.HabitsDatabase
 import com.doubletapp.habittracker.util.toMutableLiveData
 
 class AddHabitViewModel(
@@ -34,16 +35,17 @@ class AddHabitViewModel(
             it.color = habitColor
             Settings.dbDao?.update(it)
         } ?: run {
-            val addedHabit = Habit(
-                title,
-                description,
-                priority,
-                habitType,
-                countComplete,
-                period,
-                habitColor
+            Settings.dbDao?.insert(
+                Habit(
+                    title,
+                    description,
+                    priority,
+                    habitType,
+                    countComplete,
+                    period,
+                    habitColor
+                )
             )
-            Settings.dbDao?.insert(addedHabit)
         }
     }
 }
