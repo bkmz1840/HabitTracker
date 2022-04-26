@@ -1,16 +1,16 @@
 package com.doubletapp.habittracker.models
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import androidx.room.*
 
-@Parcelize
+@Entity
 data class Habit(
-    val id: Int,
-    var title: String,
-    var description: String,
-    var priority: String,
-    var type: HabitType,
-    var countComplete: Int,
-    var period: Int,
-    var color: Int
-): Parcelable
+    @ColumnInfo var title: String,
+    @ColumnInfo var description: String,
+    @ColumnInfo var priority: String,
+    @TypeConverters(HabitTypeConverter::class) var type: HabitType,
+    @ColumnInfo var countComplete: Int,
+    @ColumnInfo var period: Int,
+    @ColumnInfo var color: Int
+) {
+    @PrimaryKey(autoGenerate = true) var id: Int? = null
+}

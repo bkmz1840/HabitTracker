@@ -40,7 +40,6 @@ class SearchHabitFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.loadHabits()
         binding.editSearchTitle.addTextChangedListener(searchHabitTitleTextWatcher)
         binding.btnSortHabits.setOnClickListener {
             viewModel.sortHabitsByPriority()

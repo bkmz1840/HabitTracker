@@ -1,28 +1,22 @@
 package com.doubletapp.habittracker.viewModels
 
 import android.graphics.Color
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.models.Habit
-import com.doubletapp.habittracker.models.HabitList
 import com.doubletapp.habittracker.models.HabitType
-import com.doubletapp.habittracker.models.HabitsRepo
+import com.doubletapp.habittracker.models.HabitsDatabase
+import com.doubletapp.habittracker.util.toMutableLiveData
 
 class AddHabitViewModel(
     habitId: Int?
 ): ViewModel() {
-    var habit: Habit? = null
+    val habit: MutableLiveData<Habit> = habitId?.let {
+        Settings.dbDao?.findHabitById(it)?.toMutableLiveData()
+    } ?: MutableLiveData<Habit>()
     var habitType = HabitType.NONE
     var habitColor = Color.WHITE
-
-    init {
-        habitId?.let {
-            val loadedHabit = HabitsRepo.getHabit(it)
-            habit = loadedHabit
-            habitType = loadedHabit.type
-            habitColor = loadedHabit.color
-        }
-    }
 
     fun uploadHabit(
         title: String,
@@ -31,8 +25,7 @@ class AddHabitViewModel(
         countComplete: Int,
         period: Int
     ) {
-
-        habit?.let {
+        habit.value?.let {
             it.title = title
             it.description = description
             it.priority = priority
@@ -40,20 +33,19 @@ class AddHabitViewModel(
             it.countComplete = countComplete
             it.period = period
             it.color = habitColor
-            HabitsRepo.updateHabit(it, it.id)
+            Settings.dbDao?.update(it)
         } ?: run {
-            val id = HabitsRepo.lastId + 1
-            habit = Habit(
-                id,
-                title,
-                description,
-                priority,
-                habitType,
-                countComplete,
-                period,
-                habitColor
+            Settings.dbDao?.insert(
+                Habit(
+                    title,
+                    description,
+                    priority,
+                    habitType,
+                    countComplete,
+                    period,
+                    habitColor
+                )
             )
-            habit?.let{ HabitsRepo.addHabit(it) }
         }
     }
 }

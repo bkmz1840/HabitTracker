@@ -2,16 +2,16 @@ package com.doubletapp.habittracker.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.room.Room
 import com.doubletapp.habittracker.R
+import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.databinding.ActivityMainBinding
-import com.doubletapp.habittracker.fragments.SearchHabitFragment
+import com.doubletapp.habittracker.models.HabitsDatabase
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -34,6 +34,12 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        Settings.dbDao = Room.databaseBuilder(
+            applicationContext,
+            HabitsDatabase::class.java,
+            "HabitsDb"
+        ).allowMainThreadQueries().build().habitsDao()
     }
 
     override fun onSupportNavigateUp(): Boolean {

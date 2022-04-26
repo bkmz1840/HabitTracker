@@ -48,10 +48,13 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.habit?.let {
+        viewModel.habit.observe(viewLifecycleOwner) {
+            viewModel.habitColor = it.color
+            viewModel.habitType = it.type
             setEditableHabit(it)
             binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
         }
+        setHabitPriorityAdapter()
         binding.habitTypeRadioGroup.setOnCheckedChangeListener { _, i ->
             viewModel.habitType = when (i) {
                 R.id.habit_type_radio_bad -> HabitType.BAD
@@ -60,19 +63,22 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
             }
         }
         binding.btnShowColorPicker.setOnClickListener(btnShowColorPicker)
+        binding.btnAddHabit.setOnClickListener(btnAddHabitOnClickListener)
+    }
+
+    private fun setHabitPriorityAdapter() {
         activity?.let {
             val types = resources.getStringArray(R.array.habit_priority_spinner)
             val adapter = ArrayAdapter(it, R.layout.spinner_item, types)
             binding.editHabitPriority.setAdapter(adapter)
         }
-        binding.btnAddHabit.setOnClickListener(btnAddHabitOnClickListener)
     }
 
     private fun setEditableHabit(habit: Habit) {
         binding.editHabitTitle.text = habit.title.toEditable()
         binding.editHabitDescription.text = habit.description.toEditable()
         binding.editHabitPriority.text = habit.priority.toEditable()
-
+        setHabitPriorityAdapter()
         when (habit.type) {
             HabitType.BAD -> binding.habitTypeRadioBad.isChecked = true
             HabitType.GOOD -> binding.habitTypeRadioGood.isChecked = true
