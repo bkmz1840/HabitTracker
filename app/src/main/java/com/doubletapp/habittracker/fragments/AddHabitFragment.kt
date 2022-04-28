@@ -10,10 +10,12 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.doubletapp.habittracker.HabitsApplication
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.databinding.FragmentAddHabitBinding
 import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.models.HabitPriority
 import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.util.toEditable
 import com.doubletapp.habittracker.viewModels.AddHabitViewModel
@@ -21,6 +23,7 @@ import com.doubletapp.habittracker.viewModels.AddHabitViewModel
 class AddHabitFragment : Fragment(), IColorPickerListener {
     private lateinit var binding: FragmentAddHabitBinding
     private lateinit var viewModel: AddHabitViewModel
+    private lateinit var priorityAdapter: ArrayAdapter<String>
     private var habitId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +44,10 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
         )
         viewModel = ViewModelProvider(this, object: ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-                AddHabitViewModel(habitId) as T
+                AddHabitViewModel(
+                    habitId,
+                    (activity?.application as HabitsApplication).repository
+                ) as T
         }).get(AddHabitViewModel::class.java)
         return binding.root
     }
@@ -51,8 +57,13 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
         viewModel.habit.observe(viewLifecycleOwner) {
             viewModel.habitColor = it.color
             viewModel.habitType = it.type
+            viewModel.habitPriority = it.priority
             setEditableHabit(it)
             binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
+        }
+        viewModel.validationErrors.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) findNavController().navigateUp()
+            else setErrors(it)
         }
         setHabitPriorityAdapter()
         binding.habitTypeRadioGroup.setOnCheckedChangeListener { _, i ->
@@ -62,29 +73,40 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
                 else -> HabitType.NONE
             }
         }
+        binding.editHabitPriority.setOnItemClickListener { _, _, position, _ ->
+            when (priorityAdapter.getItem(position)) {
+                getString(R.string.habit_priority_low) -> viewModel.habitPriority = HabitPriority.LOW
+                getString(R.string.habit_priority_neutral) -> viewModel.habitPriority = HabitPriority.NEUTRAL
+                getString(R.string.habit_priority_high) -> viewModel.habitPriority = HabitPriority.HIGH
+                else -> viewModel.habitPriority = HabitPriority.NONE
+            }
+        }
         binding.btnShowColorPicker.setOnClickListener(btnShowColorPicker)
         binding.btnAddHabit.setOnClickListener(btnAddHabitOnClickListener)
     }
 
     private fun setHabitPriorityAdapter() {
         activity?.let {
-            val types = resources.getStringArray(R.array.habit_priority_spinner)
-            val adapter = ArrayAdapter(it, R.layout.spinner_item, types)
-            binding.editHabitPriority.setAdapter(adapter)
+            val types = arrayOf(
+                getString(R.string.habit_priority_low),
+                getString(R.string.habit_priority_neutral),
+                getString(R.string.habit_priority_high)
+            )
+            priorityAdapter = ArrayAdapter(it, R.layout.spinner_item, types)
+            binding.editHabitPriority.setAdapter(priorityAdapter)
         }
     }
 
     private fun setEditableHabit(habit: Habit) {
         binding.editHabitTitle.text = habit.title.toEditable()
         binding.editHabitDescription.text = habit.description.toEditable()
-        binding.editHabitPriority.text = habit.priority.toEditable()
+        binding.editHabitPriority.text = resources.getString(habit.priority.resId).toEditable()
         setHabitPriorityAdapter()
         when (habit.type) {
             HabitType.BAD -> binding.habitTypeRadioBad.isChecked = true
             HabitType.GOOD -> binding.habitTypeRadioGood.isChecked = true
-            else -> throw IllegalArgumentException("Unexpected habit type")
+            else -> {}
         }
-
         binding.editHabitCountComplete.text = habit.countComplete.toString().toEditable()
         binding.editHabitPeriod.text = habit.period.toString().toEditable()
     }
@@ -92,21 +114,9 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
     private val btnAddHabitOnClickListener = View.OnClickListener {
         val title = binding.editHabitTitle.text.toString()
         val description = binding.editHabitDescription.text.toString()
-        val priority = binding.editHabitPriority.text.toString()
         val countComplete = binding.editHabitCountComplete.text.toString().toIntOrNull()
         val period = binding.editHabitPeriod.text.toString().toIntOrNull()
-        if (title.isEmpty() || description.isEmpty() || priority.isEmpty()
-            || countComplete == null || period == null || viewModel.habitType == HabitType.NONE) {
-            Toast.makeText(
-                context,
-                resources.getString(R.string.toast_fail_add_habit),
-                Toast.LENGTH_SHORT
-            ).show()
-            setErrors(title, description, priority, countComplete, period)
-            return@OnClickListener
-        }
-        viewModel.uploadHabit(title, description, priority, countComplete, period)
-        findNavController().navigateUp()
+        viewModel.validateHabit(title, description, countComplete, period)
     }
 
     private val btnShowColorPicker = View.OnClickListener {
@@ -122,25 +132,23 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
         }
     }
 
-    private fun setErrors(
-        title: String,
-        description: String,
-        priority: String,
-        countComplete: Int?,
-        period: Int?
-    ) {
+    private fun setErrors(errorList: List<String>) {
         val emptyFieldError = resources.getString(R.string.error_field_empty)
         val failNumberError = resources.getString(R.string.error_field_not_number)
-        if (title.isEmpty())
-            binding.editHabitTitle.error = emptyFieldError
-        if (description.isEmpty())
-            binding.editHabitDescription.error = emptyFieldError
-        if (priority.isEmpty())
-            binding.editHabitPriority.error = emptyFieldError
-        if (countComplete == null)
-            binding.editHabitCountComplete.error = failNumberError
-        if (period == null)
-            binding.editHabitPeriod.error = failNumberError
+        errorList.forEach {
+            when (it) {
+                Settings.ERROR_FIELD_TITLE -> binding.editHabitTitle.error = emptyFieldError
+                Settings.ERROR_FIELD_DESCRIPTION -> binding.editHabitDescription.error = emptyFieldError
+                Settings.ERROR_FIELD_PRIORITY -> binding.editHabitPriority.error = emptyFieldError
+                Settings.ERROR_FIELD_COUNT_COMPLETE -> binding.editHabitCountComplete.error = failNumberError
+                Settings.ERROR_FIELD_PERIOD -> binding.editHabitPeriod.error = failNumberError
+            }
+        }
+        Toast.makeText(
+            context,
+            resources.getString(R.string.toast_fail_add_habit),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onColorPicked(color: Int) {

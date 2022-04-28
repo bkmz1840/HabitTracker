@@ -1,10 +1,7 @@
 package com.doubletapp.habittracker.models
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 
 @Dao
 interface IHabitDao {
@@ -14,9 +11,12 @@ interface IHabitDao {
     @Query("SELECT * FROM habit WHERE id = :id LIMIT 1")
     fun findHabitById(id: Int): LiveData<Habit>
 
-    @Insert
-    fun insert(vararg habit: Habit)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(vararg habit: Habit)
 
     @Update
-    fun update(vararg habit: Habit)
+    suspend fun update(vararg habit: Habit)
+
+    @Query("DELETE FROM habit")
+    suspend fun deleteAll()
 }

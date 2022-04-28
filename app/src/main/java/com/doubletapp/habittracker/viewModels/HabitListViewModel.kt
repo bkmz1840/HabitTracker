@@ -1,18 +1,14 @@
 package com.doubletapp.habittracker.viewModels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import com.doubletapp.habittracker.Settings
+import androidx.lifecycle.*
 import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.models.HabitsRepo
 import com.doubletapp.habittracker.util.toMutableLiveData
-import java.util.*
 
-class HabitListViewModel: ViewModel() {
+class HabitListViewModel(private val repo: HabitsRepo): ViewModel() {
     private val searchString = MutableLiveData<String>()
     private val _habits: MutableLiveData<List<Habit>> = Transformations.switchMap(searchString) {
-        Settings.dbDao?.getAll(it)
+        repo.getAllHabits(it)
     }.toMutableLiveData()
     val habits: LiveData<List<Habit>> = _habits
 
@@ -25,16 +21,18 @@ class HabitListViewModel: ViewModel() {
     }
 
     fun sortHabitsByPriority() {
-        val sortFunc = { habit: Habit ->
-            when (habit.priority) {
-                "Низкий" -> -1
-                "Средний" -> 0
-                "Высокий" -> 1
-                else -> throw IllegalArgumentException("Unexpected habit priority ${habit.priority}")
-            }
-        }
-        habits.value?.sortedByDescending(sortFunc)?.let {
+        habits.value?.sortedByDescending{ habit: Habit -> habit.priority.ordinal }?.let {
             _habits.postValue(it)
         }
     }
 }
+
+ class HabitListViewModelFactory(private val repo: HabitsRepo): ViewModelProvider.Factory {
+     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+         if (modelClass.isAssignableFrom(HabitListViewModel::class.java)) {
+             @Suppress("UNCHECKED_CAST")
+             return HabitListViewModel(repo) as T
+         }
+         throw IllegalArgumentException("Unknown ViewModel class")
+     }
+ }

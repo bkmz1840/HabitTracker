@@ -6,7 +6,7 @@ import androidx.room.*
 data class Habit(
     @ColumnInfo var title: String,
     @ColumnInfo var description: String,
-    @ColumnInfo var priority: String,
+    @TypeConverters(HabitPriorityConverter::class) var priority: HabitPriority,
     @TypeConverters(HabitTypeConverter::class) var type: HabitType,
     @ColumnInfo var countComplete: Int,
     @ColumnInfo var period: Int,
