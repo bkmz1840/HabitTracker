@@ -8,11 +8,9 @@
     <string name="edit_hint_habit_description">Описание привычки</string>
     <string name="label_spinner_habit_priority">Приоретет привычки:</string>
     <string name="habit_priority_hint">Приоритет привычки</string>
-    <string-array name="habit_priority_spinner">
-        <item>Низкий</item>
-        <item>Средний</item>
-        <item>Высокий</item>
-    </string-array>
+    <string name="habit_priority_low">Низкий</string>
+    <string name="habit_priority_neutral">Средний</string>
+    <string name="habit_priority_high">Высокий</string>
     <string name="label_radio_group_habit_type">Тип привычки:</string>
     <string name="habit_type_bad">Вредная</string>
     <string name="habit_type_neutral">Нейтральная</string>
@@ -28,6 +26,11 @@
     <string name="error_field_not_number">Не похоже на число</string>
     <string name="btn_show_color_picker">Выбрать цвет карточки с привычкой</string>
     <string name="btn_confirm_chosen_color">Подтвердить выбор</string>
+
+    <string name="habit_card_priority">Приоритет: %s</string>
+    <string name="habit_card_type">Тип: %s</string>
+    <string name="habit_card_count_complete">Количество выполнения: %s</string>
+    <string name="habit_card_period">Количество повторений в день: %s</string>
 
     <string-array name="habit_colors">
         <item>yellow</item>

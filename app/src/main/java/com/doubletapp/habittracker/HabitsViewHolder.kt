@@ -14,18 +14,23 @@ class HabitsViewHolder(
 ): RecyclerView.ViewHolder(binding.root) {
 
     fun bind(habit: Habit) {
-        val priorityValue = "Приоритет: " + habit.priority
-        val typeValue = "Тип: " + itemView.resources.getString(habit.type.resId)
-        val countCompleteValue = "Количество выполнения: " + habit.countComplete.toString()
-        val periodValue = "Количество повторений в день: " + habit.period.toString()
+        val r = itemView.resources
+        val typeStr = r.getString(habit.type.resId)
+        val priorityStr = r.getString(habit.priority.resId)
 
         binding.habitCard.setCardBackgroundColor(habit.color)
         binding.habitTitle.text = habit.title
         binding.habitDescription.text = habit.description
-        binding.habitPriority.text = priorityValue
-        binding.habitType.text = typeValue
-        binding.habitCountComplete.text = countCompleteValue
-        binding.habitPeriod.text = periodValue
+        binding.habitPriority.text = r.getString(R.string.habit_card_priority, priorityStr)
+        binding.habitType.text = r.getString(R.string.habit_card_type, typeStr)
+        binding.habitCountComplete.text = r.getString(
+            R.string.habit_card_count_complete,
+            habit.countComplete.toString()
+        )
+        binding.habitPeriod.text = r.getString(
+            R.string.habit_card_priority,
+            habit.period.toString()
+        )
 
         itemView.setOnClickListener {
             onHabitClickListener.onHabitClick(habit)

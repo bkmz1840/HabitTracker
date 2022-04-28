@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.doubletapp.habittracker.HabitsApplication
 import com.doubletapp.habittracker.IHabitClickListener
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
@@ -16,11 +17,14 @@ import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.util.sortByType
 import com.doubletapp.habittracker.viewModels.HabitListViewModel
+import com.doubletapp.habittracker.viewModels.HabitListViewModelFactory
 
 class HabitListFragment: Fragment(), IHabitClickListener {
     private lateinit var binding: FragmentHabitListBinding
     private var habitType: HabitType = HabitType.NONE
-    private val viewModel: HabitListViewModel by activityViewModels()
+    private val viewModel: HabitListViewModel by activityViewModels {
+        HabitListViewModelFactory((activity?.application as HabitsApplication).repository)
+    }
     private var habitsAdapter = HabitsAdapter(listOf(), this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
