@@ -40,9 +40,10 @@ class MainActivity : AppCompatActivity() {
     private fun loadAvatar(source: ImageView) {
         Glide.with(this)
             .load("https://www.fivechanges.com/wp-content/uploads/2014/09/astronaut-300x300.jpg")
+            .override(200, 200)
             .placeholder(R.drawable.avatar_placeholder)
             .error(R.mipmap.ic_launcher_round)
-            .centerCrop()
+            .circleCrop()
             .into(source)
     }
 
