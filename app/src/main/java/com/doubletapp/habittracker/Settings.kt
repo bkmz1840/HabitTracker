@@ -12,6 +12,7 @@ class Settings {
 
         const val LOG_ERROR_HTTP_TAG = "HTTP_ERROR"
 
+        // TODO: to gradle file
         val habitsServiceToken: String = "52f301c6-9492-452d-bc3a-5d354e33a9d0"
             //System.getenv("HABIT_TRACKER_API_TOKEN") ?: ""
     }

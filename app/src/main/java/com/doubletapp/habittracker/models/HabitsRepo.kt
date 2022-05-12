@@ -1,7 +1,6 @@
 package com.doubletapp.habittracker.models
 
 import android.util.Log
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.util.findHabit
@@ -43,7 +42,6 @@ class HabitsRepo(
 
     fun findHabitById(id: Int): LiveData<Habit> = habitsDao.findHabitById(id)
 
-    @WorkerThread
     suspend fun insert(habit: Habit) {
         try {
             withContext(Dispatchers.IO) {
@@ -59,7 +57,6 @@ class HabitsRepo(
         }
     }
 
-    @WorkerThread
     suspend fun update(habit: Habit) {
         habitsDao.update(habit)
         try {

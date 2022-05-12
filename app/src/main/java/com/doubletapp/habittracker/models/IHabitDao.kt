@@ -11,7 +11,7 @@ interface IHabitDao {
     @Query("SELECT * FROM habit WHERE id = :id LIMIT 1")
     fun findHabitById(id: Int): LiveData<Habit>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg habit: Habit)
 
     @Update
