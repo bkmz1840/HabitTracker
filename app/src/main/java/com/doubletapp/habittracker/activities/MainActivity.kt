@@ -2,11 +2,13 @@ package com.doubletapp.habittracker.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.databinding.ActivityMainBinding
 
@@ -31,6 +33,17 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        loadAvatar(navView.getHeaderView(0).findViewById(R.id.nav_header_avatar))
+    }
+
+    private fun loadAvatar(source: ImageView) {
+        Glide.with(this)
+            .load("https://www.fivechanges.com/wp-content/uploads/2014/09/astronaut-300x300.jpg")
+            .placeholder(R.drawable.avatar_placeholder)
+            .error(R.mipmap.ic_launcher_round)
+            .centerCrop()
+            .into(source)
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -48,6 +48,9 @@ class HabitListFragment: Fragment(), IHabitClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity?.application as HabitsApplication).networkMonitor.networkStatus.observe(viewLifecycleOwner) {
+            viewModel.setNetworkStatus(it)
+        }
         viewModel.habits.observe(viewLifecycleOwner) {
             if (it == null) return@observe
             val habits = it.sortByType().getHabitsByType(habitType)

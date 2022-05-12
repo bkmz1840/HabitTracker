@@ -9,5 +9,10 @@ class Settings {
         const val ERROR_FIELD_PRIORITY = "priority"
         const val ERROR_FIELD_COUNT_COMPLETE = "countComplete"
         const val ERROR_FIELD_PERIOD = "period"
+
+        const val LOG_ERROR_HTTP_TAG = "HTTP_ERROR"
+
+        val habitsServiceToken: String = "52f301c6-9492-452d-bc3a-5d354e33a9d0"
+            //System.getenv("HABIT_TRACKER_API_TOKEN") ?: ""
     }
 }

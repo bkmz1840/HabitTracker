@@ -9,7 +9,21 @@ import kotlinx.parcelize.Parcelize
 enum class HabitType(val resId: Int): Parcelable {
     NONE(-1),
     BAD(R.string.habit_type_bad),
-    GOOD(R.string.habit_type_good)
+    GOOD(R.string.habit_type_good);
+
+    fun toInt(): Int = when (this) {
+        BAD -> 0
+        GOOD -> 1
+        else -> 0
+    }
+
+    companion object {
+        fun fromInt(typeInt: Int): HabitType = when (typeInt) {
+            0 -> BAD
+            1 -> GOOD
+            else -> NONE
+        }
+    }
 }
 
 class HabitTypeConverter {
