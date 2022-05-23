@@ -66,11 +66,11 @@ class AddHabitViewModel(
             it.period = period
             it.color = habitColor
             withContext(Dispatchers.IO) {
-                repo.update(it)
+                repo.insertUpdate(it)
             }
         } ?: run {
             withContext(Dispatchers.IO) {
-                repo.insert(
+                repo.insertUpdate(
                     Habit(
                         title,
                         description,

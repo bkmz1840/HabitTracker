@@ -77,6 +77,6 @@
     <string name="search_bottom_sheet_header">Фильтры и сортировки</string>
     <string name="search_bottom_sheet_btn_sort">Сортировать по приоритету</string>
     <string name="search_bottom_sheet_edit_search_title">Название привычки</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="nav_header_desc">Avatar</string>
 </resources>

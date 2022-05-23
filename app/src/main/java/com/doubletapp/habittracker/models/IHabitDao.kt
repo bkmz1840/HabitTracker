@@ -6,12 +6,12 @@ import androidx.room.*
 @Dao
 interface IHabitDao {
     @Query("SELECT * FROM habit WHERE title LIKE :title || '%'")
-    fun getAll(title: String = ""): LiveData<List<Habit>>
+    suspend fun getAll(title: String = ""): List<Habit>
 
     @Query("SELECT * FROM habit WHERE id = :id LIMIT 1")
     fun findHabitById(id: Int): LiveData<Habit>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg habit: Habit)
 
     @Update

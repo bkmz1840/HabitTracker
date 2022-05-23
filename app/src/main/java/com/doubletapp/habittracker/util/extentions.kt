@@ -32,3 +32,8 @@ fun <T> LiveData<T>.toMutableLiveData(): MutableLiveData<T> {
     }
     return mediatorLiveData
 }
+
+fun List<Habit>.getNonServiceHabits(serviceHabits: List<Habit>): List<Habit> {
+    val mapServiceHabits = serviceHabits.associateBy { it.uid }
+    return this.filter { it.uid == null || mapServiceHabits[it.uid] != it }
+}
