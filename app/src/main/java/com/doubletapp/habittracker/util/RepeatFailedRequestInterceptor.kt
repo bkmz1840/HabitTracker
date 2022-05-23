@@ -6,7 +6,6 @@ import okhttp3.Response
 
 class RepeatFailedRequestInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        // TODO: Suspend function
         val originalRequest = chain.request()
         var response = chain.proceed(originalRequest)
         while (!response.isSuccessful) {

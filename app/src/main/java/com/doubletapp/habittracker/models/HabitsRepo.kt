@@ -3,36 +3,28 @@ package com.doubletapp.habittracker.models
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.doubletapp.habittracker.Settings
-import com.doubletapp.habittracker.util.findHabit
-import com.doubletapp.habittracker.util.getNonDbHabits
 import com.doubletapp.habittracker.util.getNonServiceHabits
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HabitsRepo(
     private val habitsDao: IHabitDao,
-    private val habitsService: IHabitsService
+    private val habitsService: IHabitsService,
+    private val scope: CoroutineScope
 ) {
     suspend fun getAllHabits(title: String = ""): List<Habit> = withContext(Dispatchers.IO) {
-        val habitsFromDb = habitsDao.getAll(title).toMutableList()
+        var habitsFromDb = habitsDao.getAll(title)
         if (title == "") {
             try {
-                val habitsFromService = habitsService.listHabits(Settings.habitsServiceToken)
-                val nonDbHabits = habitsFromService.getNonDbHabits(habitsFromDb)
-                habitsDao.insert(*nonDbHabits.toTypedArray())
-                habitsFromDb += nonDbHabits
-                val changedHabits = mutableListOf<Habit>()
-                habitsFromDb.getNonServiceHabits().forEach {
-                    val response = habitsService.createEditHabit(Settings.habitsServiceToken, it)
-                    if (response.isSuccess) {
-                        val habit = habitsFromDb.findHabit(it)
-                        if (habit != null) {
-                            habit.uid = response.uid
-                            changedHabits.add(habit)
-                        }
-                    }
+                habitsFromDb.getNonServiceHabits(habitsService.listHabits(Settings.habitsServiceToken)).forEach {
+                    habitsService.createEditHabit(Settings.habitsServiceToken, it)
                 }
-                habitsDao.update(*changedHabits.toTypedArray())
+                val habitsFromService = habitsService.listHabits(Settings.habitsServiceToken)
+                habitsDao.deleteAll()
+                habitsDao.insert(*habitsFromService.toTypedArray())
+                habitsFromDb = habitsDao.getAll()
             } catch (exc: Exception) {
                 Log.e(Settings.LOG_ERROR_HTTP_TAG, exc.toString())
             }
@@ -42,27 +34,16 @@ class HabitsRepo(
 
     fun findHabitById(id: Int): LiveData<Habit> = habitsDao.findHabitById(id)
 
-    suspend fun insert(habit: Habit) {
+    suspend fun insertUpdate(habit: Habit) = scope.launch(Dispatchers.IO) {
         try {
-            withContext(Dispatchers.IO) {
-                val response = habitsService.createEditHabit(Settings.habitsServiceToken, habit)
-                if (response.isSuccess) {
-                    habit.uid = response.uid
-                    habitsDao.update(habit)
-                }
+            val response = habitsService.createEditHabit(Settings.habitsServiceToken, habit)
+            if (response.isSuccess) {
+                habit.uid = response.uid
+                habitsDao.insert(habit)
             }
         } catch (exc: Exception) {
             Log.e(Settings.LOG_ERROR_HTTP_TAG, exc.toString())
             habitsDao.insert(habit)
-        }
-    }
-
-    suspend fun update(habit: Habit) {
-        habitsDao.update(habit)
-        try {
-            habitsService.createEditHabit(Settings.habitsServiceToken, habit)
-        } catch (exc: Exception) {
-            Log.e(Settings.LOG_ERROR_HTTP_TAG, exc.toString())
         }
     }
 }
