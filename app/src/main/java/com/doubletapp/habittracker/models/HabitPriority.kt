@@ -1,6 +1,5 @@
 package com.doubletapp.habittracker.models
 
-import androidx.room.TypeConverter
 import com.doubletapp.habittracker.R
 
 enum class HabitPriority(val resId: Int) {
@@ -9,33 +8,20 @@ enum class HabitPriority(val resId: Int) {
     NEUTRAL(R.string.habit_priority_neutral),
     HIGH(R.string.habit_priority_high);
 
-    fun toInt(): Int = when (this) {
-        HIGH -> 2
-        NEUTRAL -> 1
-        LOW -> 0
-        else -> 1
+    fun toDomain(): com.doubletapp.domain.models.HabitPriority = when (this) {
+        HIGH -> com.doubletapp.domain.models.HabitPriority.HIGH
+        NEUTRAL -> com.doubletapp.domain.models.HabitPriority.NEUTRAL
+        LOW -> com.doubletapp.domain.models.HabitPriority.LOW
+        else -> com.doubletapp.domain.models.HabitPriority.NEUTRAL
     }
 
     companion object {
-        fun fromInt(priorityInt: Int): HabitPriority = when (priorityInt) {
-            0 -> LOW
-            1 -> NEUTRAL
-            2 -> HIGH
-            else -> NONE
-        }
+        fun fromDomain(domainPriority: com.doubletapp.domain.models.HabitPriority): HabitPriority =
+            when (domainPriority) {
+                com.doubletapp.domain.models.HabitPriority.LOW -> LOW
+                com.doubletapp.domain.models.HabitPriority.NEUTRAL -> NEUTRAL
+                com.doubletapp.domain.models.HabitPriority.HIGH -> HIGH
+                else -> NONE
+            }
     }
-}
-
-class HabitPriorityConverter {
-    @TypeConverter
-    fun toHabitPriority(resId: Int): HabitPriority = when (resId) {
-        -1 -> HabitPriority.NONE
-        R.string.habit_priority_low -> HabitPriority.LOW
-        R.string.habit_priority_neutral -> HabitPriority.NEUTRAL
-        R.string.habit_priority_high -> HabitPriority.HIGH
-        else -> HabitPriority.NONE
-    }
-
-    @TypeConverter
-    fun fromHabitPriority(habitPriority: HabitPriority): Int = habitPriority.ordinal
 }

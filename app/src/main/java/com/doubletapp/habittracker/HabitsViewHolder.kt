@@ -1,8 +1,8 @@
 package com.doubletapp.habittracker
 
 import androidx.recyclerview.widget.RecyclerView
-import com.doubletapp.habittracker.databinding.HabitBinding
 import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.databinding.HabitBinding
 
 interface IHabitClickListener {
     fun onHabitClick(habit: Habit)

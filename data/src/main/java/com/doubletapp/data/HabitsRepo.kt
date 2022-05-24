@@ -1,9 +1,8 @@
-package com.doubletapp.habittracker.models
+package com.doubletapp.data
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import com.doubletapp.habittracker.Settings
-import com.doubletapp.habittracker.util.getNonServiceHabits
+import com.doubletapp.domain.models.Habit
+import com.doubletapp.domain.interfaces.IHabitsRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,8 +12,8 @@ class HabitsRepo(
     private val habitsDao: IHabitDao,
     private val habitsService: IHabitsService,
     private val scope: CoroutineScope
-) {
-    suspend fun getAllHabits(title: String = ""): List<Habit> = withContext(Dispatchers.IO) {
+): IHabitsRepo {
+    override suspend fun getAllHabits(title: String): List<Habit> = withContext(Dispatchers.IO) {
         var habitsFromDb = habitsDao.getAll(title)
         if (title == "") {
             try {
@@ -29,21 +28,26 @@ class HabitsRepo(
                 Log.e(Settings.LOG_ERROR_HTTP_TAG, exc.toString())
             }
         }
-        habitsFromDb
+        habitsFromDb.toDomain()
     }
 
-    fun findHabitById(id: Int): LiveData<Habit> = habitsDao.findHabitById(id)
+    override suspend fun findHabitById(id: Int): Habit = withContext(Dispatchers.IO) {
+        habitsDao.findHabitById(id).toDomain()
+    }
 
-    suspend fun insertUpdate(habit: Habit) = scope.launch(Dispatchers.IO) {
-        try {
-            val response = habitsService.createEditHabit(Settings.habitsServiceToken, habit)
-            if (response.isSuccess) {
-                habit.uid = response.uid
-                habitsDao.insert(habit)
+    override suspend fun insertUpdate(habit: Habit) {
+        scope.launch(Dispatchers.IO) {
+            val convertedHabit = habit.fromDomain()
+            try {
+                val response = habitsService.createEditHabit(Settings.habitsServiceToken, convertedHabit)
+                if (response.isSuccess) {
+                    convertedHabit.uid = response.uid
+                    habitsDao.insert(convertedHabit)
+                }
+            } catch (exc: Exception) {
+                Log.e(Settings.LOG_ERROR_HTTP_TAG, exc.toString())
+                habitsDao.insert(convertedHabit)
             }
-        } catch (exc: Exception) {
-            Log.e(Settings.LOG_ERROR_HTTP_TAG, exc.toString())
-            habitsDao.insert(habit)
         }
     }
 }

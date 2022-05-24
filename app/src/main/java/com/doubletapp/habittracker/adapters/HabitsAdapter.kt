@@ -4,11 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.HabitsViewHolder
 import com.doubletapp.habittracker.IHabitClickListener
 import com.doubletapp.habittracker.databinding.HabitBinding
-import com.doubletapp.habittracker.models.Habit
 
 
 class HabitDiffCallback : DiffUtil.ItemCallback<Habit>() {

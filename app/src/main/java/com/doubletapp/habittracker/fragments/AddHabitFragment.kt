@@ -46,7 +46,7 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T =
                 AddHabitViewModel(
                     habitId,
-                    (activity?.application as HabitsApplication).repository
+                    (activity?.application as HabitsApplication).appComponent.loadHabitsUseCases()
                 ) as T
         }).get(AddHabitViewModel::class.java)
         return binding.root
@@ -65,6 +65,7 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
             if (it.isEmpty()) findNavController().navigateUp()
             else setErrors(it)
         }
+        viewModel.progressLoad.observe(viewLifecycleOwner, observerLoadProgress)
         setHabitPriorityAdapter()
         binding.habitTypeRadioGroup.setOnCheckedChangeListener { _, i ->
             viewModel.habitType = when (i) {
@@ -83,6 +84,16 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
         }
         binding.btnShowColorPicker.setOnClickListener(btnShowColorPicker)
         binding.btnAddHabit.setOnClickListener(btnAddHabitOnClickListener)
+    }
+
+    private val observerLoadProgress = {  status: Boolean ->
+        if (status) {
+            binding.btnAddHabit.visibility = View.GONE
+            binding.progressLoadHabit.visibility = View.VISIBLE
+        } else {
+            binding.btnAddHabit.visibility = View.VISIBLE
+            binding.progressLoadHabit.visibility = View.GONE
+        }
     }
 
     private fun setHabitPriorityAdapter() {

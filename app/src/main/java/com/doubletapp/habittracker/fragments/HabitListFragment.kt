@@ -7,14 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.HabitsApplication
 import com.doubletapp.habittracker.IHabitClickListener
 import com.doubletapp.habittracker.R
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.databinding.FragmentHabitListBinding
-import com.doubletapp.habittracker.models.Habit
-import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.util.sortByType
 import com.doubletapp.habittracker.viewModels.HabitListViewModel
 import com.doubletapp.habittracker.viewModels.HabitListViewModelFactory
@@ -23,7 +23,9 @@ class HabitListFragment: Fragment(), IHabitClickListener {
     private lateinit var binding: FragmentHabitListBinding
     private var habitType: HabitType = HabitType.NONE
     private val viewModel: HabitListViewModel by activityViewModels {
-        HabitListViewModelFactory((activity?.application as HabitsApplication).repository)
+        HabitListViewModelFactory(
+            (activity?.application as HabitsApplication).appComponent.loadHabitsUseCases()
+        )
     }
     private var habitsAdapter = HabitsAdapter(listOf(), this)
 
@@ -53,8 +55,20 @@ class HabitListFragment: Fragment(), IHabitClickListener {
             val habits = it.sortByType().getHabitsByType(habitType)
             if (habits.isNotEmpty()) {
                 binding.textEmptyHabits.visibility = View.GONE
+            } else {
+                binding.textEmptyHabits.visibility = View.VISIBLE
             }
             habitsAdapter.habits = habits
+        }
+        viewModel.progressStatus.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.progressUploadHabits.visibility = View.VISIBLE
+                binding.textEmptyHabits.visibility = View.GONE
+                binding.habitsList.visibility = View.GONE
+            } else {
+                binding.habitsList.visibility = View.VISIBLE
+                binding.progressUploadHabits.visibility = View.GONE
+            }
         }
         binding.habitsList.adapter = habitsAdapter
     }

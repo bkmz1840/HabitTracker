@@ -1,4 +1,4 @@
-package com.doubletapp.habittracker.models
+package com.doubletapp.data.models
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

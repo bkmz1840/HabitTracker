@@ -1,5 +1,7 @@
-package com.doubletapp.habittracker.models
+package com.doubletapp.data
 
+import com.doubletapp.data.models.ApiResponse
+import com.doubletapp.data.models.Habit
 import retrofit2.http.*
 
 interface IHabitsService {
