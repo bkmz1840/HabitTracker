@@ -1,15 +1,17 @@
 package com.doubletapp.habittracker.viewModels
 
 import androidx.lifecycle.*
-import com.doubletapp.domain.HabitsUseCases
+import com.doubletapp.domain.HabitsInteractor
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.util.fromDomain
 import com.doubletapp.habittracker.util.toDomain
 import com.doubletapp.habittracker.util.toMutableLiveData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 
-class HabitListViewModel(private val useCases: HabitsUseCases): ViewModel() {
+class HabitListViewModel(private val interactor: HabitsInteractor): ViewModel() {
     private val searchString = MutableLiveData<String>()
     private val _habits: MutableLiveData<List<Habit>> = Transformations.switchMap(searchString) {
         liveData { emit(loadHabits(it)) }
@@ -25,7 +27,7 @@ class HabitListViewModel(private val useCases: HabitsUseCases): ViewModel() {
 
     private suspend fun loadHabits(title: String): List<Habit> = withContext(Dispatchers.IO) {
         _progressStatus.postValue(true)
-        val habits = useCases.getAllHabits(title).fromDomain()
+        val habits = interactor.getAllHabits(title).fromDomain()
         _progressStatus.postValue(false)
         habits
     }
@@ -41,15 +43,15 @@ class HabitListViewModel(private val useCases: HabitsUseCases): ViewModel() {
     }
 
     fun submitHabitComplete(habit: Habit): Flow<Boolean> = flow {
-        emit(useCases.submitHabitComplete(habit.toDomain()))
+        emit(interactor.submitHabitComplete(habit.toDomain()))
     }
 }
 
- class HabitListViewModelFactory(private val useCases: HabitsUseCases): ViewModelProvider.Factory {
+ class HabitListViewModelFactory(private val interactor: HabitsInteractor): ViewModelProvider.Factory {
      override fun <T : ViewModel?> create(modelClass: Class<T>): T {
          if (modelClass.isAssignableFrom(HabitListViewModel::class.java)) {
              @Suppress("UNCHECKED_CAST")
-             return HabitListViewModel(useCases) as T
+             return HabitListViewModel(interactor) as T
          }
          throw IllegalArgumentException("Unknown ViewModel class")
      }

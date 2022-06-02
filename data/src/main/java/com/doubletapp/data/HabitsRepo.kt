@@ -18,10 +18,10 @@ class HabitsRepo(
         var habitsFromDb = habitsDao.getAll(title)
         if (title == "") {
             try {
-                habitsFromDb.getNonServiceHabits(habitsService.listHabits(Settings.habitsServiceToken)).forEach {
-                    habitsService.createEditHabit(Settings.habitsServiceToken, it)
+                habitsFromDb.getNonServiceHabits(habitsService.listHabits(BuildConfig.API_TOKEN)).forEach {
+                    habitsService.createEditHabit(BuildConfig.API_TOKEN, it)
                 }
-                val habitsFromService = habitsService.listHabits(Settings.habitsServiceToken)
+                val habitsFromService = habitsService.listHabits(BuildConfig.API_TOKEN)
                 habitsDao.deleteAll()
                 habitsDao.insert(*habitsFromService.toTypedArray())
                 habitsFromDb = habitsDao.getAll()
@@ -40,7 +40,7 @@ class HabitsRepo(
         scope.launch(Dispatchers.IO) {
             val convertedHabit = habit.fromDomain()
             try {
-                val response = habitsService.createEditHabit(Settings.habitsServiceToken, convertedHabit)
+                val response = habitsService.createEditHabit(BuildConfig.API_TOKEN, convertedHabit)
                 if (response.isSuccess) {
                     convertedHabit.uid = response.uid
                     habitsDao.insert(convertedHabit)
@@ -53,11 +53,10 @@ class HabitsRepo(
     }
 
     override suspend fun submitCompleteHabit(habit: Habit): Boolean = withContext(Dispatchers.IO) {
-        // TODO: Flow
         habit.uid?.let {
             try {
                 val date = Date().time.toInt()
-                val res = habitsService.submitCompleteHabit(Settings.habitsServiceToken, date, it)
+                val res = habitsService.submitCompleteHabit(BuildConfig.API_TOKEN, date, it)
                 if (res.isSuccess) {
                     val convertedHabit = habit.fromDomain()
                     convertedHabit.currentComplete += 1

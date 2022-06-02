@@ -16,19 +16,18 @@ import com.doubletapp.habittracker.databinding.FragmentHabitListBinding
 import com.doubletapp.habittracker.util.sortByType
 import com.doubletapp.habittracker.viewModels.HabitListViewModel
 import com.doubletapp.habittracker.viewModels.HabitListViewModelFactory
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class HabitListFragment: Fragment(), IHabitClickListener, IHabitCompleteListener {
+class HabitListFragment: Fragment(), IHabitListener {
     private lateinit var binding: FragmentHabitListBinding
     private var habitType: HabitType = HabitType.NONE
     private val viewModel: HabitListViewModel by activityViewModels {
         HabitListViewModelFactory(
-            (activity?.application as HabitsApplication).appComponent.loadHabitsUseCases()
+            (activity?.application as HabitsApplication).appComponent.loadHabitsInteractor()
         )
     }
-    private var habitsAdapter = HabitsAdapter(listOf(), this, this)
+    private var habitsAdapter = HabitsAdapter(listOf(), this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,9 +80,10 @@ class HabitListFragment: Fragment(), IHabitClickListener, IHabitCompleteListener
     }
 
     override fun onHabitComplete(habit: Habit) {
-        lifecycleScope.launch {
+        (activity?.application as HabitsApplication).applicationScope.launch {
             viewModel.submitHabitComplete(habit).collect {
-                if (!it) return@launch
+                if (!it) return@collect
+                habit.currentComplete += 1
                 val msg = if (habit.type == HabitType.BAD) {
                     if (habit.currentComplete <= habit.countComplete)
                         getString(

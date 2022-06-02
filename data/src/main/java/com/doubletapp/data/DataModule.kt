@@ -20,39 +20,29 @@ class DataModule(
 ) {
     @Singleton
     @Provides
-    // TODO: Split
-    fun provideLoadHabitsService(): IHabitsService = Retrofit.Builder()
-        .client(
-            OkHttpClient()
-                .newBuilder()
-                .addInterceptor(RepeatFailedRequestInterceptor())
-                .build()
-        )
-        .baseUrl("https://droid-test-server.doubletapp.ru/api/")
-        .addConverterFactory(
-            GsonConverterFactory.create(
-                GsonBuilder()
-                    .registerTypeAdapter(
-                        Habit::class.java,
-                        HabitJsonSerializer()
-                    )
-                    .registerTypeAdapter(
-                        Habit::class.java,
-                        HabitJsonDeserializer()
-                    )
-                    .registerTypeAdapter(
-                        CreateEditResponse::class.java,
-                        CreateEditResponseJsonDeserializer()
-                    )
-                    .registerTypeAdapter(
-                        HabitCompleteResponse::class.java,
-                        HabitCompleteResponseJsonDeserializer()
-                    )
-                    .create()
+    fun provideLoadHabitsService(): IHabitsService {
+        val client = OkHttpClient()
+            .newBuilder()
+            .addInterceptor(RepeatFailedRequestInterceptor())
+            .build()
+        val gson = GsonBuilder()
+            .registerTypeAdapter(
+                Habit::class.java,
+                HabitJsonSerializer()
             )
-        )
-        .build()
-        .create(IHabitsService::class.java)
+            .registerTypeAdapter(
+                Habit::class.java,
+                HabitJsonDeserializer()
+            )
+            .create()
+        val converterFactory = GsonConverterFactory.create(gson)
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BuildConfig.API_BASE_URL)
+            .client(client)
+            .addConverterFactory(converterFactory)
+            .build()
+        return retrofit.create(IHabitsService::class.java)
+    }
 
     @Singleton
     @Provides

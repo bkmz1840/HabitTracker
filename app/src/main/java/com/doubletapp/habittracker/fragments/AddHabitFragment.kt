@@ -47,7 +47,7 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T =
                 AddHabitViewModel(
                     habitId,
-                    (activity?.application as HabitsApplication).appComponent.loadHabitsUseCases()
+                    (activity?.application as HabitsApplication).appComponent.loadHabitsInteractor()
                 ) as T
         }).get(AddHabitViewModel::class.java)
         return binding.root

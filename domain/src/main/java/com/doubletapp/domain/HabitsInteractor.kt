@@ -5,7 +5,7 @@ import com.doubletapp.domain.models.Habit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class HabitsUseCases(private val habitsRepo: IHabitsRepo) {
+class HabitsInteractor(private val habitsRepo: IHabitsRepo) {
     suspend fun getAllHabits(title: String = ""): List<Habit> = withContext(Dispatchers.IO) {
         habitsRepo.getAllHabits(title)
     }

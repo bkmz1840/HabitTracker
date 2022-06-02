@@ -2,7 +2,7 @@ package com.doubletapp.habittracker.viewModels
 
 import android.graphics.Color
 import androidx.lifecycle.*
-import com.doubletapp.domain.HabitsUseCases
+import com.doubletapp.domain.HabitsInteractor
 import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitPriority
@@ -16,10 +16,10 @@ import kotlinx.coroutines.withContext
 
 class AddHabitViewModel(
     habitId: Int?,
-    private val useCases: HabitsUseCases,
+    private val interactor: HabitsInteractor,
 ) : ViewModel() {
     val habit: MutableLiveData<Habit> = habitId?.let {
-        liveData { emit(useCases.findHabitById(it).fromDomain()) }.toMutableLiveData()
+        liveData { emit(interactor.findHabitById(it).fromDomain()) }.toMutableLiveData()
     } ?: MutableLiveData<Habit>()
     var habitType = HabitType.NONE
     var habitColor = Color.WHITE
@@ -73,11 +73,11 @@ class AddHabitViewModel(
             it.period = habitPeriod
             it.color = habitColor
             withContext(Dispatchers.IO) {
-                useCases.insertUpdate(it.toDomain())
+                interactor.insertUpdate(it.toDomain())
             }
         } ?: run {
             withContext(Dispatchers.IO) {
-                useCases.insertUpdate(
+                interactor.insertUpdate(
                     Habit(
                         null,
                         title,

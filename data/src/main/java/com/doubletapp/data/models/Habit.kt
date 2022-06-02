@@ -4,6 +4,7 @@ import androidx.room.*
 import com.doubletapp.domain.models.HabitPriority
 import com.doubletapp.domain.models.HabitType
 import com.google.gson.*
+import com.google.gson.annotations.SerializedName
 import java.lang.reflect.Type
 import java.util.*
 

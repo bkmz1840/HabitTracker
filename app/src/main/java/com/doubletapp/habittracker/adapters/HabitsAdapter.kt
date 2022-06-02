@@ -6,11 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.HabitsViewHolder
-import com.doubletapp.habittracker.IHabitClickListener
-import com.doubletapp.habittracker.IHabitCompleteListener
+import com.doubletapp.habittracker.IHabitListener
 import com.doubletapp.habittracker.databinding.HabitBinding
-import kotlinx.coroutines.CoroutineScope
-
 
 class HabitDiffCallback : DiffUtil.ItemCallback<Habit>() {
 
@@ -22,8 +19,7 @@ class HabitDiffCallback : DiffUtil.ItemCallback<Habit>() {
 
 class HabitsAdapter(
     _habits: List<Habit>,
-    private val onHabitClickListener: IHabitClickListener,
-    private val onHabitCompleteListener: IHabitCompleteListener
+    private val onHabitListener: IHabitListener,
 ): ListAdapter<Habit, HabitsViewHolder>(HabitDiffCallback()) {
     var habits: List<Habit> = _habits
         set(value) {
@@ -35,8 +31,7 @@ class HabitsAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return HabitsViewHolder(
             HabitBinding.inflate(inflater, parent, false),
-            onHabitClickListener,
-            onHabitCompleteListener
+            onHabitListener
         )
     }
 
