@@ -7,7 +7,8 @@ data class Habit(
     val priority: HabitPriority,
     val type: HabitType,
     val countComplete: Int,
-    val period: Int,
+    var currentComplete: Int,
+    val period: Long,
     val color: Int,
     val uid: String? = null
 )

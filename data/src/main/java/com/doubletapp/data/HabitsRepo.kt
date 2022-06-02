@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 class HabitsRepo(
     private val habitsDao: IHabitDao,
@@ -49,5 +50,24 @@ class HabitsRepo(
                 habitsDao.insert(convertedHabit)
             }
         }
+    }
+
+    override suspend fun submitCompleteHabit(habit: Habit): Boolean = withContext(Dispatchers.IO) {
+        // TODO: Flow
+        habit.uid?.let {
+            try {
+                val date = Date().time.toInt()
+                val res = habitsService.submitCompleteHabit(Settings.habitsServiceToken, date, it)
+                if (res.isSuccess) {
+                    val convertedHabit = habit.fromDomain()
+                    convertedHabit.currentComplete += 1
+                    habitsDao.insert(convertedHabit)
+                }
+                return@withContext res.isSuccess
+            } catch (exc: Exception) {
+                Log.e(Settings.LOG_ERROR_HTTP_TAG, exc.toString())
+                return@withContext false
+            }
+        } ?: run { false }
     }
 }

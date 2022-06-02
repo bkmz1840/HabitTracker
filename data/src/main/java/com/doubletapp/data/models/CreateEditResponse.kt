@@ -5,7 +5,7 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import java.lang.reflect.Type
 
-data class ApiResponse(
+data class CreateEditResponse(
     val uid: String? = null,
     val code: Int? = null,
     val message: String? = null
@@ -13,12 +13,12 @@ data class ApiResponse(
     val isSuccess: Boolean = uid != null
 }
 
-class ApiResponseJsonDeserializer: JsonDeserializer<ApiResponse> {
-    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): ApiResponse {
+class CreateEditResponseJsonDeserializer: JsonDeserializer<CreateEditResponse> {
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): CreateEditResponse {
         val jsonObj = json?.asJsonObject
         jsonObj?.let {
-            if (it.has("uid")) return ApiResponse(it.get("uid").asString)
-            return ApiResponse(
+            if (it.has("uid")) return CreateEditResponse(it.get("uid").asString)
+            return CreateEditResponse(
                 code = it.get("code").asInt,
                 message = it.get("message").asString
             )

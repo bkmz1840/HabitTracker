@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -21,6 +20,7 @@ class DataModule(
 ) {
     @Singleton
     @Provides
+    // TODO: Split
     fun provideLoadHabitsService(): IHabitsService = Retrofit.Builder()
         .client(
             OkHttpClient()
@@ -41,8 +41,12 @@ class DataModule(
                         HabitJsonDeserializer()
                     )
                     .registerTypeAdapter(
-                        ApiResponse::class.java,
-                        ApiResponseJsonDeserializer()
+                        CreateEditResponse::class.java,
+                        CreateEditResponseJsonDeserializer()
+                    )
+                    .registerTypeAdapter(
+                        HabitCompleteResponse::class.java,
+                        HabitCompleteResponseJsonDeserializer()
                     )
                     .create()
             )

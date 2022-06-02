@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.doubletapp.data.models.Habit
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -26,6 +25,7 @@ abstract class HabitsDatabase: RoomDatabase() {
                 HabitsDatabase::class.java,
                 "HabitsDb"
             ).build()
+            GlobalScope.launch { dbInstance.habitsDao().deleteAll() }
             instance = dbInstance
             dbInstance
         }

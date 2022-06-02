@@ -14,6 +14,7 @@ data class Habit(
     @TypeConverters(HabitPriorityConverter::class) var priority: HabitPriority,
     @TypeConverters(HabitTypeConverter::class) var type: HabitType,
     @ColumnInfo var countComplete: Int,
+    @ColumnInfo(defaultValue = "0") var currentComplete: Int,
     @ColumnInfo var period: Int,
     @ColumnInfo var color: Int,
     @ColumnInfo var uid: String? = null
@@ -47,6 +48,7 @@ class HabitTypeConverter {
 }
 
 class HabitJsonSerializer : JsonSerializer<Habit> {
+    // TODO: Serialized name
     override fun serialize(src: Habit, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement =
         JsonObject().apply {
             addProperty("title", src.title)
@@ -55,7 +57,7 @@ class HabitJsonSerializer : JsonSerializer<Habit> {
             addProperty("count", src.countComplete)
             addProperty("priority", src.priority.toInt())
             addProperty("frequency", src.period)
-            addProperty("date", Date().time)
+            addProperty("date", (Date().time / 1000).toInt())
             addProperty("type", src.type.toInt())
             if (src.uid != null)
                 addProperty("uid", src.uid)
@@ -72,6 +74,7 @@ class HabitJsonDeserializer: JsonDeserializer<Habit> {
                 HabitPriority.fromInt(it.get("priority").asInt),
                 HabitType.fromInt(it.get("type").asInt),
                 it.get("count").asInt,
+                it.get("done_dates").asJsonArray.size(),
                 it.get("frequency").asInt,
                 it.get("color").asInt,
                 it.get("uid").asString,

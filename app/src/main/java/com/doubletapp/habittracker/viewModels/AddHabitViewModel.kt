@@ -24,6 +24,7 @@ class AddHabitViewModel(
     var habitType = HabitType.NONE
     var habitColor = Color.WHITE
     var habitPriority = HabitPriority.NONE
+    var habitPeriod: Long = -1L
     val validationErrors: MutableLiveData<List<String>> = MutableLiveData()
 
     private val _progressLoad: MutableLiveData<Boolean> = MutableLiveData()
@@ -32,8 +33,7 @@ class AddHabitViewModel(
     fun validateHabit(
         title: String,
         description: String,
-        countComplete: Int?,
-        period: Int?
+        countComplete: Int?
     ) {
         _progressLoad.postValue(true)
         val errorFields = mutableListOf<String>()
@@ -41,7 +41,7 @@ class AddHabitViewModel(
         if (description.isEmpty()) errorFields.add(Settings.ERROR_FIELD_DESCRIPTION)
         if (habitPriority == HabitPriority.NONE) errorFields.add(Settings.ERROR_FIELD_PRIORITY)
         if (countComplete == null) errorFields.add(Settings.ERROR_FIELD_COUNT_COMPLETE)
-        if (period == null) errorFields.add(Settings.ERROR_FIELD_PERIOD)
+        if (habitPeriod == -1L) errorFields.add(Settings.ERROR_FIELD_PERIOD)
         if (habitType == HabitType.NONE) errorFields.add(Settings.ERROR_FIELD_TYPE)
 
         if (errorFields.isNotEmpty()) {
@@ -50,8 +50,8 @@ class AddHabitViewModel(
         }
         else {
             viewModelScope.launch(Dispatchers.IO) {
-                if (countComplete != null && period != null) viewModelScope.launch(Dispatchers.IO) {
-                    uploadHabit(title, description, countComplete, period)
+                if (countComplete != null) viewModelScope.launch(Dispatchers.IO) {
+                    uploadHabit(title, description, countComplete)
                     validationErrors.postValue(listOf())
                 }
                 _progressLoad.postValue(false)
@@ -62,8 +62,7 @@ class AddHabitViewModel(
     private suspend fun uploadHabit(
         title: String,
         description: String,
-        countComplete: Int,
-        period: Int
+        countComplete: Int
     ) {
         habit.value?.let {
             it.title = title
@@ -71,7 +70,7 @@ class AddHabitViewModel(
             it.priority = habitPriority
             it.type = habitType
             it.countComplete = countComplete
-            it.period = period
+            it.period = habitPeriod
             it.color = habitColor
             withContext(Dispatchers.IO) {
                 useCases.insertUpdate(it.toDomain())
@@ -86,7 +85,8 @@ class AddHabitViewModel(
                         habitPriority,
                         habitType,
                         countComplete,
-                        period,
+                        0,
+                        habitPeriod,
                         habitColor
                     ).toDomain()
                 )

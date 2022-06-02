@@ -7,7 +7,8 @@ data class Habit(
     var priority: HabitPriority,
     var type: HabitType,
     var countComplete: Int,
-    var period: Int,
+    var currentComplete: Int,
+    var period: Long,
     var color: Int,
     var uid: String? = null
 )

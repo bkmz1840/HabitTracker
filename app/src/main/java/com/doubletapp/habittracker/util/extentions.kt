@@ -41,6 +41,7 @@ fun com.doubletapp.domain.models.Habit.fromDomain(): Habit = Habit(
     HabitPriority.fromDomain(this.priority),
     HabitType.fromDomain(this.type),
     this.countComplete,
+    this.currentComplete,
     this.period,
     -1 * this.color,
     this.uid
@@ -55,6 +56,7 @@ fun Habit.toDomain(): com.doubletapp.domain.models.Habit = com.doubletapp.domain
     this.priority.toDomain(),
     this.type.toDomain(),
     this.countComplete,
+    this.currentComplete,
     this.period,
     -1 * this.color,
     this.uid

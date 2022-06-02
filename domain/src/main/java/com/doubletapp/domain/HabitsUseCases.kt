@@ -15,4 +15,10 @@ class HabitsUseCases(private val habitsRepo: IHabitsRepo) {
     }
 
     suspend fun insertUpdate(habit: Habit) = habitsRepo.insertUpdate(habit)
+
+    suspend fun submitHabitComplete(habit: Habit): Boolean = withContext(Dispatchers.IO) {
+        val result = habitsRepo.submitCompleteHabit(habit)
+        if (result) habit.currentComplete += 1
+        result
+    }
 }

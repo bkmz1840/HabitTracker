@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.doubletapp.domain.HabitsUseCases
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.util.fromDomain
+import com.doubletapp.habittracker.util.toDomain
 import com.doubletapp.habittracker.util.toMutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -37,6 +38,10 @@ class HabitListViewModel(private val useCases: HabitsUseCases): ViewModel() {
         habits.value?.sortedByDescending{ habit: Habit -> habit.priority.ordinal }?.let {
             _habits.postValue(it)
         }
+    }
+
+    fun submitHabitComplete(habit: Habit): Flow<Boolean> = flow {
+        emit(useCases.submitHabitComplete(habit.toDomain()))
     }
 }
 

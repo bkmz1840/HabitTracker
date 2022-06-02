@@ -57,5 +57,12 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size"/>
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_habit_submit_complete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="@dimen/text_size"
+                android:text="@string/habit_card_btn_submit"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

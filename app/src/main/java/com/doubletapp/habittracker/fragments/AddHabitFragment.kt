@@ -19,6 +19,7 @@ import com.doubletapp.habittracker.models.HabitPriority
 import com.doubletapp.habittracker.models.HabitType
 import com.doubletapp.habittracker.util.toEditable
 import com.doubletapp.habittracker.viewModels.AddHabitViewModel
+import com.google.android.material.datepicker.MaterialDatePicker
 
 class AddHabitFragment : Fragment(), IColorPickerListener {
     private lateinit var binding: FragmentAddHabitBinding
@@ -58,6 +59,7 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
             viewModel.habitColor = it.color
             viewModel.habitType = it.type
             viewModel.habitPriority = it.priority
+            viewModel.habitPeriod = it.period
             setEditableHabit(it)
             binding.btnAddHabit.text = resources.getString(R.string.btn_edit_habit)
         }
@@ -82,8 +84,27 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
                 else -> viewModel.habitPriority = HabitPriority.NONE
             }
         }
+        binding.btnPickHabitPeriod.setOnClickListener(btnPickHabitPeriodListener)
         binding.btnShowColorPicker.setOnClickListener(btnShowColorPicker)
         binding.btnAddHabit.setOnClickListener(btnAddHabitOnClickListener)
+    }
+
+    private val btnPickHabitPeriodListener = View.OnClickListener {
+        var startDate = MaterialDatePicker.todayInUtcMilliseconds()
+        if (viewModel.habitPeriod != -1L) startDate = viewModel.habitPeriod
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(getString(R.string.btn_pick_habit_period))
+            .setSelection(startDate)
+            .build()
+        datePicker.addOnPositiveButtonClickListener {
+            viewModel.habitPeriod = it
+        }
+        activity?.let {
+            datePicker.show(
+                it.supportFragmentManager,
+                "date_picker_dialog"
+            )
+        }
     }
 
     private val observerLoadProgress = {  status: Boolean ->
@@ -119,15 +140,13 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
             else -> {}
         }
         binding.editHabitCountComplete.text = habit.countComplete.toString().toEditable()
-        binding.editHabitPeriod.text = habit.period.toString().toEditable()
     }
 
     private val btnAddHabitOnClickListener = View.OnClickListener {
         val title = binding.editHabitTitle.text.toString()
         val description = binding.editHabitDescription.text.toString()
         val countComplete = binding.editHabitCountComplete.text.toString().toIntOrNull()
-        val period = binding.editHabitPeriod.text.toString().toIntOrNull()
-        viewModel.validateHabit(title, description, countComplete, period)
+        viewModel.validateHabit(title, description, countComplete)
     }
 
     private val btnShowColorPicker = View.OnClickListener {
@@ -152,7 +171,6 @@ class AddHabitFragment : Fragment(), IColorPickerListener {
                 Settings.ERROR_FIELD_DESCRIPTION -> binding.editHabitDescription.error = emptyFieldError
                 Settings.ERROR_FIELD_PRIORITY -> binding.editHabitPriority.error = emptyFieldError
                 Settings.ERROR_FIELD_COUNT_COMPLETE -> binding.editHabitCountComplete.error = failNumberError
-                Settings.ERROR_FIELD_PERIOD -> binding.editHabitPeriod.error = failNumberError
             }
         }
         Toast.makeText(

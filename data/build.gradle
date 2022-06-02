@@ -18,6 +18,12 @@ android {
 
         buildConfigField("String", "API_BASE_URL", "\"https://droid-test-server.doubletapp.ru/api/\"")
         buildConfigField("String", "API_TOKEN", "\"52f301c6-9492-452d-bc3a-5d354e33a9d0\"")
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {

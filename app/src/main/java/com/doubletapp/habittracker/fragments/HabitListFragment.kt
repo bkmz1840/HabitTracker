@@ -5,21 +5,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.doubletapp.habittracker.*
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitType
-import com.doubletapp.habittracker.HabitsApplication
-import com.doubletapp.habittracker.IHabitClickListener
-import com.doubletapp.habittracker.R
-import com.doubletapp.habittracker.Settings
 import com.doubletapp.habittracker.adapters.HabitsAdapter
 import com.doubletapp.habittracker.databinding.FragmentHabitListBinding
 import com.doubletapp.habittracker.util.sortByType
 import com.doubletapp.habittracker.viewModels.HabitListViewModel
 import com.doubletapp.habittracker.viewModels.HabitListViewModelFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class HabitListFragment: Fragment(), IHabitClickListener {
+class HabitListFragment: Fragment(), IHabitClickListener, IHabitCompleteListener {
     private lateinit var binding: FragmentHabitListBinding
     private var habitType: HabitType = HabitType.NONE
     private val viewModel: HabitListViewModel by activityViewModels {
@@ -27,7 +28,7 @@ class HabitListFragment: Fragment(), IHabitClickListener {
             (activity?.application as HabitsApplication).appComponent.loadHabitsUseCases()
         )
     }
-    private var habitsAdapter = HabitsAdapter(listOf(), this)
+    private var habitsAdapter = HabitsAdapter(listOf(), this, this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +78,28 @@ class HabitListFragment: Fragment(), IHabitClickListener {
         val bundle = Bundle()
         habit.id?.let { bundle.putInt(Settings.KEY_EDIT_HABIT_ID, it) }
         findNavController().navigate(R.id.nav_add_habit, bundle)
+    }
+
+    override fun onHabitComplete(habit: Habit) {
+        lifecycleScope.launch {
+            viewModel.submitHabitComplete(habit).collect {
+                if (!it) return@launch
+                val msg = if (habit.type == HabitType.BAD) {
+                    if (habit.currentComplete <= habit.countComplete)
+                        getString(
+                            R.string.habit_bad_can_complete,
+                            (habit.countComplete - habit.currentComplete).toString()
+                        ) else getString(R.string.habit_bad_cannot_complete, habit.title)
+                } else {
+                    if (habit.currentComplete <= habit.countComplete)
+                        getString(
+                            R.string.habit_good_can_complete,
+                            (habit.countComplete - habit.currentComplete).toString()
+                        ) else getString(R.string.habit_good_cannot_complete)
+                }
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     companion object {
