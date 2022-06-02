@@ -1,16 +1,17 @@
 package com.doubletapp.habittracker
 
 import androidx.recyclerview.widget.RecyclerView
-import com.doubletapp.habittracker.databinding.HabitBinding
 import com.doubletapp.habittracker.models.Habit
+import com.doubletapp.habittracker.databinding.HabitBinding
 
-interface IHabitClickListener {
+interface IHabitListener {
     fun onHabitClick(habit: Habit)
+    fun onHabitComplete(habit: Habit)
 }
 
 class HabitsViewHolder(
     private val binding: HabitBinding,
-    private val onHabitClickListener: IHabitClickListener
+    private val onHabitListener: IHabitListener,
 ): RecyclerView.ViewHolder(binding.root) {
 
     fun bind(habit: Habit) {
@@ -33,7 +34,11 @@ class HabitsViewHolder(
         )
 
         itemView.setOnClickListener {
-            onHabitClickListener.onHabitClick(habit)
+            onHabitListener.onHabitClick(habit)
+        }
+
+        binding.btnHabitSubmitComplete.setOnClickListener {
+            onHabitListener.onHabitComplete(habit)
         }
     }
 }

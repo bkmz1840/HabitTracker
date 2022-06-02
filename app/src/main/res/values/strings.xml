@@ -17,8 +17,8 @@
     <string name="habit_type_good">Хорошая</string>
     <string name="habit_color_picker_label">Цвет карточки с привычкой</string>
     <string name="habit_color_picker_chosen_color_text">Выбранный цвет</string>
-    <string name="edit_hint_habit_count_complete">Количество выполнения привычки</string>
-    <string name="edit_hint_habit_period">Количество выполнения в день</string>
+    <string name="edit_hint_habit_count_complete">Количество выполнений привычки</string>
+    <string name="btn_pick_habit_period">Выбрать дату окончания выполнений</string>
     <string name="btn_add_habit">Добавить привычку</string>
     <string name="btn_edit_habit">Отредактировать привычку</string>
     <string name="toast_fail_add_habit">Не все поля заполнены или заполнены неправильно</string>
@@ -31,6 +31,12 @@
     <string name="habit_card_type">Тип: %s</string>
     <string name="habit_card_count_complete">Количество выполнения: %s</string>
     <string name="habit_card_period">Количество повторений в день: %s</string>
+    <string name="habit_card_btn_submit">Выполнено</string>
+
+    <string name="habit_bad_can_complete">Можете выполний еще раз: %s</string>
+    <string name="habit_bad_cannot_complete">Хватит "%s"</string>
+    <string name="habit_good_can_complete">Стоит выполнить еще раз: %s</string>
+    <string name="habit_good_cannot_complete">You are breathtaking!</string>
 
     <string-array name="habit_colors">
         <item>yellow</item>

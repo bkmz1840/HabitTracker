@@ -123,25 +123,15 @@
                     android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edit_habit_period_layout"
-                android:layout_width="match_parent"
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_pick_habit_period"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/edit_hint_habit_period"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                android:layout_marginTop="20dp"
+                android:text="@string/btn_pick_habit_period"
                 app:layout_constraintTop_toBottomOf="@id/edit_habit_count_complete_layout"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_habit_period"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                app:layout_constraintEnd_toEndOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_show_color_picker"
@@ -149,7 +139,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="@string/btn_show_color_picker"
-                app:layout_constraintTop_toBottomOf="@id/edit_habit_period_layout"
+                app:layout_constraintTop_toBottomOf="@id/btn_pick_habit_period"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -158,6 +148,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/btn_add_habit"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintTop_toBottomOf="@id/btn_show_color_picker"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ProgressBar
+                android:id="@+id/progress_load_habit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                style="@style/Widget.AppCompat.ProgressBar"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
                 app:layout_constraintTop_toBottomOf="@id/btn_show_color_picker"

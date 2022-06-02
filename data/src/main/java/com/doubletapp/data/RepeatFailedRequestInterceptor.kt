@@ -1,4 +1,4 @@
-package com.doubletapp.habittracker.util
+package com.doubletapp.data
 
 import android.util.Log
 import okhttp3.Interceptor

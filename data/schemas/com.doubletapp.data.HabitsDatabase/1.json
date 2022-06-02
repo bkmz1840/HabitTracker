@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "03c857bb51692854a2a4bc4975cdbe21",
+    "identityHash": "5a410023f0b2fce3bb35556140efd712",
     "entities": [
       {
         "tableName": "Habit",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`title` TEXT NOT NULL, `description` TEXT NOT NULL, `priority` TEXT NOT NULL, `type` TEXT NOT NULL, `countComplete` INTEGER NOT NULL, `period` INTEGER NOT NULL, `color` INTEGER NOT NULL, `uid` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`title` TEXT NOT NULL, `description` TEXT NOT NULL, `priority` TEXT NOT NULL, `type` TEXT NOT NULL, `countComplete` INTEGER NOT NULL, `currentComplete` INTEGER NOT NULL DEFAULT 0, `period` INTEGER NOT NULL, `color` INTEGER NOT NULL, `uid` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT)",
         "fields": [
           {
             "fieldPath": "title",
@@ -37,6 +37,13 @@
             "columnName": "countComplete",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "currentComplete",
+            "columnName": "currentComplete",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "period",
@@ -76,7 +83,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '03c857bb51692854a2a4bc4975cdbe21')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5a410023f0b2fce3bb35556140efd712')"
     ]
   }
 }

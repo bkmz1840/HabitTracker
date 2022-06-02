@@ -6,6 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.doubletapp.habittracker.models.Habit
 import com.doubletapp.habittracker.models.HabitList
+import com.doubletapp.habittracker.models.HabitPriority
 import com.doubletapp.habittracker.models.HabitType
 
 fun String?.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
@@ -33,7 +34,30 @@ fun <T> LiveData<T>.toMutableLiveData(): MutableLiveData<T> {
     return mediatorLiveData
 }
 
-fun List<Habit>.getNonServiceHabits(serviceHabits: List<Habit>): List<Habit> {
-    val mapServiceHabits = serviceHabits.associateBy { it.uid }
-    return this.filter { it.uid == null || mapServiceHabits[it.uid] != it }
-}
+fun com.doubletapp.domain.models.Habit.fromDomain(): Habit = Habit(
+    this.id,
+    this.title,
+    this.description,
+    HabitPriority.fromDomain(this.priority),
+    HabitType.fromDomain(this.type),
+    this.countComplete,
+    this.currentComplete,
+    this.period,
+    -1 * this.color,
+    this.uid
+)
+
+fun List<com.doubletapp.domain.models.Habit>.fromDomain(): List<Habit> = this.map { it.fromDomain() }
+
+fun Habit.toDomain(): com.doubletapp.domain.models.Habit = com.doubletapp.domain.models.Habit(
+    this.id,
+    this.title,
+    this.description,
+    this.priority.toDomain(),
+    this.type.toDomain(),
+    this.countComplete,
+    this.currentComplete,
+    this.period,
+    -1 * this.color,
+    this.uid
+)

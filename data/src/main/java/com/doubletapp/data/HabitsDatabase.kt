@@ -1,9 +1,11 @@
-package com.doubletapp.habittracker.models
+package com.doubletapp.data
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.doubletapp.data.models.Habit
 
 @Database(
     entities = [Habit::class],
